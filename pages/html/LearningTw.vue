@@ -1,5 +1,5 @@
 <template>
-    <div class="min-h-screen bg-gray-100 text-gray-900 p-6 space-y-8">
+    <div class="min-h-screen  text-gray-900 py-6 space-y-8">
         <h1 class="text-3xl font-bold text-center">高效學習技巧整理</h1>
 
         <!-- 錯誤的學習方式 -->

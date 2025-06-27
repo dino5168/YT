@@ -1,3 +1,331 @@
 <template>
-    <h1>Learn Six</h1>
+    <div class="bg-gray-50">
+        <!-- Header -->
+        <header class="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16">
+            <div class="container mx-auto px-4 text-center">
+                <h1 class="text-4xl md:text-6xl font-bold mb-4">
+                    如何在6個月內學會第二語言
+                </h1>
+                <p class="text-xl md:text-2xl opacity-90">
+                    基於心理學研究的高效語言學習方法
+                </p>
+                <div class="mt-8">
+                    <span class="bg-gray-950 bg-opacity-20 px-4 py-2 rounded-full text-lg">
+                        Chris Lonsdale TED 演講精華
+                    </span>
+                </div>
+            </div>
+        </header>
+
+        <!-- 核心概念 -->
+        <section class="py-16 bg-white">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">核心概念：打破傳統迷思</h2>
+                <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                    <div class="bg-red-50 border-l-4 border-red-400 p-6 rounded-lg">
+                        <h3 class="text-xl font-bold text-red-800 mb-3">❌ 迷思一：需要天賦</h3>
+                        <p class="text-gray-700">
+                            Zoe的例子證明：在荷蘭學Dutch失敗，被說沒天賦，但在巴西6個月內學會葡萄牙語。
+                            <strong class="text-red-600">天賦不是關鍵！</strong>
+                        </p>
+                    </div>
+                    <div class="bg-red-50 border-l-4 border-red-400 p-6 rounded-lg">
+                        <h3 class="text-xl font-bold text-red-800 mb-3">❌ 迷思二：需要沈浸環境</h3>
+                        <p class="text-gray-700">
+                            香港的西方人住10年不會中文，海外華人20年不會英語。
+                            <strong class="text-red-600">單純沈浸無效，溺水的人學不會游泳！</strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 五大原則 -->
+        <section class="py-16 bg-gray-100">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">🎯 五大學習原則</h2>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div v-for="(principle, index) in principles" :key="index"
+                        class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
+                        <div class="text-3xl mb-4">{{ principle.icon }}</div>
+                        <h3 class="text-xl font-bold mb-3 text-gray-800">
+                            原則{{ index + 1 }}：{{ principle.title }}
+                        </h3>
+                        <p class="text-gray-600 mb-4">{{ principle.description }}</p>
+                        <div class="bg-blue-50 p-3 rounded-lg">
+                            <p class="text-sm text-blue-800 font-medium">
+                                {{ principle.example }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 七大實踐行動 -->
+        <section class="py-16 bg-white">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">🚀 七大實踐行動</h2>
+                <div class="max-w-4xl mx-auto">
+                    <div v-for="(action, index) in actions" :key="index"
+                        class="mb-8 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 border-l-4"
+                        :class="getActionBorderColor(index)">
+                        <div class="flex items-start space-x-4">
+                            <div class="text-2xl font-bold text-white rounded-full w-10 h-10 flex items-center justify-center"
+                                :class="getActionBgColor(index)">
+                                {{ index + 1 }}
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-xl font-bold mb-2 text-gray-800">{{ action.title }}</h3>
+                                <p class="text-gray-700 mb-3">{{ action.description }}</p>
+                                <div class="bg-white p-3 rounded-lg border">
+                                    <p class="text-sm text-gray-600">
+                                        <strong>實際做法：</strong>{{ action.practice }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 學習進程 -->
+        <section class="py-16 bg-gradient-to-r from-green-50 to-blue-50">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">📅 6個月學習進程</h2>
+                <div class="max-w-3xl mx-auto">
+                    <div v-for="(week, index) in timeline" :key="index"
+                        class="mb-6 bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
+                        <div class="flex items-center mb-3">
+                            <div
+                                class="bg-green-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-3">
+                                {{ index + 1 }}
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-800">{{ week.period }}</h3>
+                        </div>
+                        <p class="text-gray-700 mb-2">{{ week.focus }}</p>
+                        <div class="bg-green-50 p-3 rounded">
+                            <p class="text-sm text-green-800">{{ week.examples }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 語言父母 -->
+        <section class="py-16 bg-yellow-50">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center mb-8 text-gray-800">👨‍👩‍👧‍👦 語言父母的四大規則</h2>
+                <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-lg p-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div v-for="(rule, index) in parentRules" :key="index" class="flex items-start space-x-3">
+                            <div
+                                class="bg-yellow-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold flex-shrink-0">
+                                {{ index + 1 }}
+                            </div>
+                            <p class="text-gray-700">{{ rule }}</p>
+                        </div>
+                    </div>
+                    <div class="mt-6 p-4 bg-yellow-100 rounded-lg">
+                        <p class="text-sm text-yellow-800">
+                            <strong>注意：</strong>配偶通常不是好的語言父母選擇！
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 總結 -->
+        <section class="py-16 bg-gradient-to-r from-purple-600 to-blue-600 text-white">
+            <div class="container mx-auto px-4 text-center">
+                <h2 class="text-3xl font-bold mb-8">🎯 核心總結</h2>
+                <div class="max-w-4xl mx-auto grid md:grid-cols-3 gap-8">
+                    <div class="bg-gray-950 bg-opacity-10 rounded-lg p-6" v-for="(summary, i) in summaries" :key="i">
+                        <div class="text-3xl mb-4">{{ summary.icon }}</div>
+                        <h3 class="text-xl font-bold mb-3">{{ summary.title }}</h3>
+                        <p class="text-sm opacity-90">{{ summary.text }}</p>
+                    </div>
+                </div>
+                <div class="mt-12">
+                    <p class="text-xl mb-6"><strong>記住：這些都在你的控制範圍內！</strong></p>
+                    <p class="text-lg opacity-90">
+                        執行部分方法會有改善，全部執行就能在6個月內流利掌握第二語言
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="bg-gray-800 text-white py-8">
+            <div class="container mx-auto px-4 text-center">
+                <p class="text-gray-400">
+                    基於 Chris Lonsdale TED 演講《How to learn any language in six months》整理
+                </p>
+            </div>
+        </footer>
+    </div>
 </template>
+
+<script setup>
+const principles = [
+    {
+        icon: "🎯",
+        title: "相關性優先",
+        description:
+            "專注於與你相關的語言內容，就像在森林中注意到熊爪痕跡一樣",
+        example: "學習與你工作、興趣、目標相關的詞彙和表達",
+    },
+    {
+        icon: "🔧",
+        title: "語言即工具",
+        description: "從第一天就把語言當作溝通工具使用，而不是學習對象",
+        example:
+            "中文打字的同事：夜校9個月學不會，工作需要48小時就會了",
+    },
+    {
+        icon: "💡",
+        title: "理解先於記憶",
+        description: "先理解意思，語言會在無意識中習得（可理解輸入）",
+        example: "火車上8小時對話，兩週後自然理解周圍的中文",
+    },
+    {
+        icon: "💪",
+        title: "生理訓練",
+        description: "語言學習不只是知識累積，更是生理和肌肉訓練",
+        example: "協調43塊面部肌肉發音，訓練大腦過濾聲音",
+    },
+    {
+        icon: "😌",
+        title: "心理狀態",
+        description: "保持放鬆、好奇、容忍模糊的心理狀態",
+        example: "不要追求100%理解，接受部分理解就好",
+    },
+];
+const actions = [
+    {
+        title: "大量聆聽（泡腦子）",
+        description: "讓自己沈浸在大量的目標語言中，聆聽節奏和模式",
+        practice:
+            "不管理解與否，持續聽目標語言，注意重複的模式和突出的部分",
+    },
+    {
+        title: "先懂意思再記單字",
+        description: "通過肢體語言和已知模式理解意思",
+        practice: "觀察說話者的肢體語言，利用已知語言的相似詞彙",
+    },
+    {
+        title: "開始混合使用",
+        description:
+            "創造性組合詞彙，10個動詞+10個名詞+10個形容詞=1000種表達",
+        practice: '像嬰兒一樣說話："我"、"洗澡"、"現在"',
+    },
+    {
+        title: "專注核心詞彙",
+        description: "優先學習高頻詞彙，1000詞覆蓋85%日常對話",
+        practice: '第一週學工具箱用語："怎麼說？"、"不懂"、"再說一次"',
+    },
+    {
+        title: "找語言父母",
+        description: "找一個耐心的語言夥伴，像父母對孩子一樣溝通",
+        practice: "找願意耐心理解你意思、不糾正錯誤、給予回饋的人",
+    },
+    {
+        title: "模仿面部表情",
+        description: "觀察母語者的面部肌肉使用方式",
+        practice:
+            "聽聲音的感覺，感受發音的方式，觀察母語者說話時的面部動作",
+    },
+    {
+        title: "直接連結",
+        description:
+            "直接將新語言連結到內在的圖像和感受，不通過母語翻譯",
+        practice:
+            '想到"火"時，直接聯想煙味、劈啪聲、火焰，然後連結目標語言詞彙',
+    },
+]
+const timeline = [
+    {
+        period: "第一週",
+        focus: "建立語言工具箱",
+        examples: '"怎麼說？"、"我不懂"、"請再說一次"、"什麼意思？"',
+    },
+    {
+        period: "第二週",
+        focus: "基本詞彙組合",
+        examples:
+            '"我"、"這個"、"你"、"那個"、"給"、"熱" - 簡單代詞、名詞、動詞',
+    },
+    {
+        period: "第三四週",
+        focus: "邏輯連接詞",
+        examples: '"雖然"、"但是"、"因此" - 讓表達更複雜有邏輯',
+    },
+    {
+        period: "第二個月",
+        focus: "擴展核心詞彙",
+        examples: "累積到1000個高頻詞彙，覆蓋85%日常對話",
+    },
+    {
+        period: "第三四個月",
+        focus: "流利對話練習",
+        examples: "與語言父母進行複雜對話，提升表達準確性",
+    },
+    {
+        period: "第五六個月",
+        focus: "達到流利水準",
+        examples: "掌握3000詞彙，達到98%日常溝通覆蓋率",
+    },
+]
+const parentRules = [
+    "努力理解你想表達的意思，即使你表達得不準確",
+    "從不糾正你的錯誤",
+    "會回饋他們對你話語的理解，讓你能適當回應",
+    "使用你已經懂的詞彙與你交流",
+]
+
+
+const summaries = [
+    {
+        icon: '🧠',
+        title: '心理原則',
+        text: '注意力、意義、相關性、記憶 - 四大心理要素相互連結，專注於與你相關的內容',
+    },
+    {
+        icon: '💪',
+        title: '生理訓練',
+        text: '語言學習是肌肉訓練，需要協調43塊面部肌肉，如果臉部痠痛，說明你做對了',
+    },
+    {
+        icon: '🎯',
+        title: '高頻詞彙',
+        text: '1000個單字覆蓋85%日常對話，3000個單字覆蓋98%，掌握核心就能流利溝通',
+    },
+];
+
+const getActionBorderColor = (index) => {
+    const colors = [
+        'border-blue-500',
+        'border-green-500',
+        'border-purple-500',
+        'border-red-500',
+        'border-yellow-500',
+        'border-indigo-500',
+        'border-pink-500',
+    ];
+    return colors[index % colors.length];
+};
+
+const getActionBgColor = (index) => {
+    const colors = [
+        'bg-blue-500',
+        'bg-green-500',
+        'bg-purple-500',
+        'bg-red-500',
+        'bg-yellow-500',
+        'bg-indigo-500',
+        'bg-pink-500',
+    ];
+    return colors[index % colors.length];
+};
+</script>

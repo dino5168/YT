@@ -15,10 +15,14 @@
   font-weight: bold;
   font-style: normal;
 }
-
+html,
 body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
   font-family: "MyFont", sans-serif;
 }
+
 @layer utilities {
   .custom-scrollbar::-webkit-scrollbar {
     width: 8px;

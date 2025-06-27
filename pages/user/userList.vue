@@ -107,20 +107,29 @@ const fetchUsers = async () => {
 
     try {
         // 使用 $fetch 而不是 useFetch，並強制重新獲取
-        const data = await $fetch<User[]>(`${baseUrl}/query/users`, {
+        const token = useCookie('auth_token').value
+
+        const { data, error } = await useApi<User[]>(`${baseUrl}/query/users`, {
             // 防止快取問題
             headers: {
+                Authorization: `Bearer ${token}`,
                 'Cache-Control': 'no-cache'
             }
         })
-
-        if (data && Array.isArray(data)) {
-            users.value = data
-            console.log('成功載入使用者資料:', data.length, '筆')
+        if (!error) {
+            if (data && Array.isArray(data)) {
+                users.value = data
+                console.log('成功載入使用者資料:', data.length, '筆')
+            } else {
+                console.warn('API 回傳資料格式不正確:', error)
+                errorMessage.value = error as string
+            }
         } else {
-            console.warn('API 回傳資料格式不正確:', data)
-            errorMessage.value = 'API 回傳資料格式錯誤'
+            errorMessage.value = error as string
         }
+
+
+
     } catch (err) {
         console.error('取得使用者發生錯誤', err)
         errorMessage.value = `載入資料時發生錯誤: ${err instanceof Error ? err.message : '未知錯誤'}`

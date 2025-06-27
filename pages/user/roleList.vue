@@ -263,6 +263,8 @@
 </template>
 
 <script setup>
+import { Beaker } from 'lucide-vue-next'
+
 // 使用 Nuxt 3 Composition API
 const searchQuery = ref('')
 const showModal = ref(false)
@@ -273,13 +275,16 @@ const roleToDelete = ref(null)
 const roles = ref([])
 const loadingRoles = ref(false)
 
+const baseUrl = useBaseUrl();
+const url = `${baseUrl}/query/role`
 
 const fetchRoles = async () => {
+
     loadingRoles.value = true
     try {
-        const { data, error } = await useFetch('http://localhost:8000/query/role')
-        if (error.value) throw new Error()
-        roles.value = data.value || []
+        const { data, error } = await useApi("http://localhost:8000/query/role", { method: "GET" })
+        if (error) throw new Error()
+        roles.value = data || []
     } catch (err) {
         showNotification('error', '無法載入角色資料')
     } finally {

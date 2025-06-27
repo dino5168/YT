@@ -2,7 +2,7 @@
     <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
         <!-- Header Section -->
         <header class="bg-white shadow-lg">
-            <div class="max-w-6xl mx-auto px-6 py-8">
+            <div class="max-w-6xl mx-auto  py-8">
                 <h1 class="text-4xl font-bold text-gray-800 mb-4">
                     英語溝通的真相：態度比技巧更重要
                 </h1>
@@ -232,7 +232,7 @@
                         立即行動：一個改變一切的方法
                     </h2>
 
-                    <div class="bg-white bg-opacity-20 p-6 rounded-xl backdrop-blur-sm">
+                    <div class="bg-white text-gray-950 bg-opacity-20 p-6 rounded-xl backdrop-blur-sm">
                         <h3 class="text-2xl font-semibold mb-4">
                             🎯 核心策略
                         </h3>
@@ -292,7 +292,7 @@
         </main>
 
         <!-- Footer -->
-        <footer class="bg-gray-800 text-white py-8">
+        <footer class="bg-blue-800 text-white py-8">
             <div class="max-w-6xl mx-auto px-6 text-center">
                 <p class="text-lg">
                     基於20年東南亞英語培訓經驗的深度洞察

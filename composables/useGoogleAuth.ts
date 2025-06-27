@@ -67,12 +67,13 @@ export const useGoogleAuth = () => {
     //window.location.href = url;
   };
 
+  //沒有使用
   const handleGoogleCredentialResponse = async (response: {
     credential: string;
   }) => {
     loading.value = true;
     errorMessage.value = "";
-    alert("handleGoogleCredentialResponse");
+    //alert("handleGoogleCredentialResponse");
 
     const {data, error} = await useApi("/auth/google/callback", {
       method: "POST",
