@@ -38,6 +38,10 @@ const limit = 10
 let offset = 0
 
 const apibaseUrl = useBaseUrl()
+const user = useCookie('user')
+
+const isLogin = computed(() => !!user.value)
+const router = useRouter()
 
 
 const fetchVideos = async () => {
@@ -51,7 +55,6 @@ const fetchVideos = async () => {
             noMore.value = true
             return
         }
-
         // 模擬分頁（實際應從 API 取得分頁）
         const nextPage = data.slice(offset, offset + limit)
         videos.value.push(...nextPage)
@@ -83,6 +86,7 @@ const handleScroll = () => {
 }
 
 onMounted(() => {
+
     fetchVideos()
     window.addEventListener('scroll', handleScroll)
 })

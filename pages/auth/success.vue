@@ -23,16 +23,20 @@
 </template>
 
 <script setup lang="ts">
+
+import { useBaseUrl } from '#imports'
+const baseUrl = useBaseUrl()
+
 definePageMeta({
     layout: 'auth'
 })
+
 
 const route = useRoute()
 const router = useRouter()
 
 onMounted(async () => {
     const token = route.query.token as string
-
     if (token) {
         // 儲存 token
         const authToken = useCookie('auth_token', {
@@ -43,29 +47,29 @@ onMounted(async () => {
         })
         authToken.value = token
 
-        try {
-            // 獲取用戶資訊
-            const userInfo = await $fetch('/auth/verify', {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            })
 
-            // 儲存用戶資訊
+        // 使用 useApi 取得使用者資訊
+        const { data, error } = await useApi<{ payload: any }>(`${baseUrl}/auth/verify`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            },
+            method: "POST"
+        })
+
+        if (error) {
+            console.error('驗證失敗:', error)
+        } else if (data) {
             const user = useCookie('user', {
                 maxAge: 60 * 60 * 24 * 7,
                 httpOnly: false,
                 secure: true,
                 sameSite: 'lax'
             })
-            user.value = (userInfo as { payload: any }).payload
-
-        } catch (error) {
-            console.error('Failed to get user info:', error)
+            user.value = data.payload
         }
     }
 
-    // 延遲跳轉，讓用戶看到成功訊息
+    // 延遲跳轉
     setTimeout(() => {
         router.push('/')
     }, 1000)

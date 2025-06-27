@@ -5,10 +5,9 @@
             <div class="flex items-center justify-between">
                 <!-- 網站名稱，可切換手機選單 -->
                 <div class="text-xl font-bold cursor-pointer select-none" @click="menuOpen = !menuOpen">
-                    🎬 多媒體英語教學
+                    🎬 多媒體語言學習
                 </div>
                 <DesktopNav :links="navLinks" />
-
                 <!-- 手機版漢堡選單按鈕 -->
                 <button class="sm:hidden text-gray-700" @click="menuOpen = !menuOpen">
                     <svg v-if="!menuOpen" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2"
@@ -19,8 +18,16 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
-            </div>
 
+
+                <div v-if="isLogin">
+                    <ButtonImageCircle :image-url="userData">
+                    </ButtonImageCircle>;
+                </div>
+                <div v-else>
+                    <NuxtLink to="/auth/Login">登入</NuxtLink>
+                </div>
+            </div>
             <!-- 手機選單 -->
             <MobileNav :links="navLinks" :menuOpen="menuOpen" />
         </header>
@@ -43,64 +50,13 @@ import { ref } from 'vue'
 import DesktopNav from '~/components/nav/DesktopNav.vue'
 import MobileNav from '~/components/nav/MobileNav.vue'
 import FooterSection from '~/components/Footer/FooterSection.vue'
+import ButtonImageCircle from '~/components/Buttons/ButtonImageCircle.vue'
 import { useNavLinks } from '#imports'
 
 const menuOpen = ref(false)
 const dropdownOpen = ref(false)
 
-// 備用的導航連結（如果 API 失敗時使用）
-/*
-const fallbackNavLinks = [
-    { label: '首頁', href: '/' },
-    {
-        label: '如何學習',
-        dropdown: [
-            { label: '初學者的提示', href: '/html/Learn50tips' },
-            { label: '有效學習', href: '/html/learningtw' },
-            { label: '高效學習-6個月', href: '/html/LearnSixMonth.html' },
-            { label: '不要害羞恐懼', href: '/html/Learninglanguage' },
-        ]
-    },
-    {
-        label: '學習',
-        dropdown: [
-            { label: '字典查詢', href: '/dict/hello' },
-            { label: '文法訓練', href: '/tools/GrammarCheck' },
-            { label: '英文打字練習', href: '/tools/typegame' },
-            { label: '錄音練習', href: '/voices/VoiceRecorder' },
-        ]
-    },
-    {
-        label: '老師',
-        dropout: [
-            { label: '影片匯入', href: '/admin/download' },
-            { label: '字幕修正', href: '/admin/manageSrt' },
-            { label: '影片列表', href: '/admin/videoList' },
-            { label: '音訊轉文字', href: '/tools/mp32text' },
-            { label: '文字轉音訊', href: '/tools/text2mp3' }
-        ]
-    },
-    {
-        label: '家長',
-        dropdown: [
-            { label: '影片匯入', href: '/admin/download' },
-            { label: '字幕修正', href: '/admin/manageSrt' },
-            { label: '影片列表', href: '/admin/videoList' },
-            { label: '音訊轉文字', href: '/tools/mp32text' },
-            { label: '文字轉音訊', href: '/tools/text2mp3' }
-        ]
-    },
-    {
-        label: '系統管理',
-        dropdown: [
-            { label: '帳號管理', href: '/user/UserList' },
-            { label: '角色管理', href: '/user/RoleList' },
-        ]
-    },
-    { label: '關於我們', href: '/aboutus' },
-    { label: '聯絡我們', href: '/contact' }
-]
-*/
+
 // 使用 useNavLinks 來獲取導航連結
 const { data: navLinksData, pending, error } = await useNavLinks()
 
@@ -116,14 +72,26 @@ const navLinks = computed(() => {
 if (error.value) {
     console.error('Failed to load navigation links:', error.value)
 }
-import { useAuth } from '~/composables/useAuth'
 
-const { isLoggedIn, user } = useAuth()
+const user = useCookie('user')
+const authToken = useCookie('auth_token')
 
-const logout = () => {
-    isLoggedIn.value = false
-    user.value = null
-}
+const isLogin = computed(() => !!authToken.value && !!user.value)
+// 創建一個 computed 來正確解析用戶數據
+const userData = computed(() => {
+    if (!user.value) return null
+
+    let parsedUser
+    try {
+        parsedUser = typeof user.value === 'string' ? JSON.parse(user.value) : user.value
+    } catch (e) {
+        console.error('Failed to parse user cookie:', e)
+        return null
+    }
+    console.log(parsedUser?.avatar_url)
+    return parsedUser?.avatar_url
+})
+
 </script>
 
 <style scoped>
