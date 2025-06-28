@@ -50,10 +50,7 @@ const handleSuccess = async (response: GoogleResponse) => {
         }
 
         const data = await res.json()
-        //user.value = data
-        //isLoggedIn.value = true
-
-        alert('🎉 登入成功，歡迎 ' + data.name)
+        //alert('🎉 登入成功，歡迎 ' + data.name)
 
         // ✅ 成功登入後導向首頁或 dashboard
         router.push('/')
