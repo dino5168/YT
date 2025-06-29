@@ -47,12 +47,13 @@ const props = defineProps<{
         id: string
         type: string
         nav_item_id: string,
-        dropdown?: Array<{ label: string; href: string, id: string, type: string, nav_item_id: string }>
+        order: string,
+        dropdown?: Array<{ label: string; href?: string, id: string, type: string, nav_item_id: string, order: string }>
     }>
 }>()
 
 const emit = defineEmits<{
-    (e: 'select', item: { label: string; href?: string, id: string, type: string, nav_item_id: string }): void
+    (e: 'select', item: { label: string; href?: string, id: string, type: string, nav_item_id: string, order: string }): void
 }>()
 
 const openItems = ref<{ [key: number]: boolean }>({})

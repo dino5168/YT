@@ -70,7 +70,7 @@
                                         <div
                                             class="flex-shrink-0 h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center">
                                             <span class="text-sm font-medium text-blue-600">{{ role.name.charAt(0)
-                                            }}</span>
+                                                }}</span>
                                         </div>
                                         <div class="ml-3">
                                             <div class="text-sm font-medium text-gray-900">{{ role.name }}</div>
@@ -277,12 +277,18 @@ const loadingRoles = ref(false)
 
 const baseUrl = useBaseUrl();
 const url = `${baseUrl}/query/role`
+const token = useCookie('auth_token').value
 
 const fetchRoles = async () => {
-
     loadingRoles.value = true
     try {
-        const { data, error } = await useApi("http://localhost:8000/query/role", { method: "GET" })
+        const { data, error } = await useApi(url, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Cache-Control': 'no-cache'
+            }
+        })
+
         if (error) throw new Error()
         roles.value = data || []
     } catch (err) {

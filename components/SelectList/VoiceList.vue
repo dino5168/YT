@@ -43,6 +43,10 @@ const voices = ref<Voice[]>([])
 const selectedVoice = ref('')
 const messageText = ref('This is a book.\nHello.\nWe are the World.')
 
+const baseUrl = useBaseUrl()
+const fetchUrl = `${baseUrl}/voices/tts`
+
+
 const postMessage = async () => {
     if (!selectedVoice.value || !messageText.value.trim()) {
         alert('請選擇語音並輸入內容')
@@ -55,7 +59,7 @@ const postMessage = async () => {
     }
 
     try {
-        const res = await fetch('http://127.0.0.1:8000/voices/tts', {
+        const res = await fetch(fetchUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -76,7 +80,7 @@ const postMessage = async () => {
 
 onMounted(async () => {
     try {
-        const res = await fetch('http://127.0.0.1:8000/voices/enlist')
+        const res = await fetch(`${baseUrl}/voices/enlist`)
         const json = await res.json()
 
         console.log('[Fetch 回傳]', json)

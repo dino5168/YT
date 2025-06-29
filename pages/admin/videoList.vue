@@ -48,8 +48,10 @@ interface Video {
     local_thumbnail_path?: string;
     thumbnail_url?: string;
 }
+const baseUrl = useBaseUrl()
+const urlFetch = `${baseUrl}/videos/list`
 
-const { data: videos, pending } = await useFetch<Video[]>('http://127.0.0.1:8000/videos/list');
+const { data: videos, pending } = await useFetch<Video[]>(urlFetch);
 
 // 顯示格式化時間（秒 → mm:ss）
 const formatDuration = (seconds: number) => {

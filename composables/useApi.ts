@@ -14,6 +14,7 @@ export async function useApi<T = any>(
         ...(options.headers || {}),
       },
       body: options.body ? JSON.stringify(options.body) : undefined,
+      credentials: "include", // 這一行是重點，送出 cookie
     });
 
     const json = await res.json();

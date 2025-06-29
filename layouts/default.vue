@@ -42,6 +42,7 @@
 
         <!-- 頁尾 -->
         <FooterSection :navLinks="navLinks" />
+        <ToastContainer />
     </div>
 </template>
 

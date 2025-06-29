@@ -20,7 +20,7 @@
             </div>
 
             <!-- 編輯區 -->
-            <div id="menuEdit" class="bg-blue-800 w-2/3 h-[20rem] p-4 overflow-auto">
+            <div id="menuEdit" class="bg-blue-800 w-2/3 h-auto p-4 overflow-auto">
                 <template v-if="selectedItem">
                     <h2 class="text-xl font-bold text-white mb-2">編輯選單項目</h2>
                     <div class="mb-2">
@@ -30,8 +30,9 @@
                         <label class="text-white font-semibold block">ID:{{ editForm.id }}</label>
                     </div>
                     <div>
-                        <label class="text-white font-semibold block">Nav_item_id:{{ editForm.nav_item_id }}
-                            <input v-model="editForm.nav_item_id" type="text" class="w-full px-2 py-1 rounded" />
+                        <label class="text-white font-semibold block">父節點ID:{{ editForm.nav_item_id }}
+                            <input v-model="editForm.nav_item_id" type="text"
+                                class="w-full text-red-500 px-2 py-1 rounded" />
                         </label>
                     </div>
 
@@ -43,6 +44,10 @@
                     <div>
                         <label class="text-white font-semibold block">連結:</label>
                         <input v-model="editForm.href" type="text" class="w-full px-2 py-1 rounded" />
+                    </div>
+                    <div>
+                        <label class="text-white font-semibold block">次序:</label>
+                        <input v-model="editForm.order" type="text" class="w-full px-2 py-1 rounded" />
                     </div>
                 </template>
 
@@ -57,20 +62,23 @@
 
 <script setup lang="ts">
 import TreeMenu from '~/components/Tree/TreeMenu.vue'
+import { useToast } from '@/composables/useToast' // ✅ 確保此檔案存在
+const { showToast } = useToast()
 
 const navItems = ref([])
-const selectedItem = ref<{ label: string; href?: string, id: string, type: string, nav_item_id: string } | null>(null)
-const editForm = ref({ label: '', href: '', id: '', type: '', nav_item_id: '' })
+const selectedItem = ref<{ label: string; href?: string, id: string, type: string, nav_item_id: string, order: string } | null>(null)
+const editForm = ref({ label: '', href: '', id: '', type: '', nav_item_id: '', order: '' })
 const baseUrl = useBaseUrl()
 const urlNavLinks = `${baseUrl}/nav/links`
 
-const handleSelect = (item: { label: string; href?: string, id: string, type: string, nav_item_id: string }) => {
+const handleSelect = (item: { label: string; href?: string, id: string, type: string, nav_item_id: string, order: string }) => {
     selectedItem.value = item
     editForm.value = {
         id: item.id,
         type: item.type,
         label: item.label,
         nav_item_id: item.nav_item_id,
+        order: item.order,
         href: item.href || '',
 
     }
@@ -92,11 +100,13 @@ const getBody = () => {
         return {
             label: editForm.value.label,
             href: editForm.value.href,
+            order: editForm.value.order
         }
     } else {
         return {
             label: editForm.value.label,
             href: editForm.value.href,
+            order: editForm.value.order,
             nav_item_id: editForm.value.nav_item_id
 
         }
@@ -114,12 +124,15 @@ const dataUpdate = async () => {
             "Cache-Control": "no-cache",
         },
         body: getBody(),
+
     })
 
     if (error) {
-        alert(`更新失敗：${error}`)
+        showToast(`更新失敗：${error}`)
+        //showToast(`更新失敗：${error}`,"error")
     } else {
         //alert(`更新成功：${JSON.stringify(data)}`)
+        showToast("更新成功")
         fetchNavItems()
     }
 }
@@ -151,6 +164,7 @@ const dataAppendMain = async () => {
         alert(`新增失敗：${error}`)
     } else {
         //alert(`新增成功：${JSON.stringify(data)}`)
+        showToast("新增成功")
         fetchNavItems()
     }
 }
@@ -191,7 +205,7 @@ const getDeleteUrl = () => {
 //刪除資料
 const dataDelete = async () => {
     const deleteUrl = getDeleteUrl()
-    alert(deleteUrl)
+
     const token = useCookie('auth_token').value
     const { data, error } = await useApi(deleteUrl, {
         method: "DELETE",
@@ -206,6 +220,7 @@ const dataDelete = async () => {
         alert(`刪除失敗：${error}`)
     } else {
         //alert(`刪除成功：${JSON.stringify(data)}`)
+        showToast("刪除成功")
         fetchNavItems()
     }
 }
