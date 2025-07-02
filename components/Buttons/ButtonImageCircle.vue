@@ -1,7 +1,7 @@
 <template>
     <div ref="container" class="relative inline-block text-left">
         <button @click="toggleDropdown"
-            class="w-8 h-8 rounded-full overflow-hidden border-2 border-gray-300 hover:border-blue-500 transition-all">
+            class="w-8 h-8 rounded-full overflow-hidden border-2 hover:cursor-pointer border-gray-300 hover:border-blue-500 transition-all">
             <img :src="imageUrl" alt="User Avatar" class="w-full h-full object-cover" />
         </button>
 
@@ -19,7 +19,8 @@
                     <a href="/settings" class="block px-4 py-2 hover:bg-gray-100">
                         設定
                     </a>
-                    <button @click="logout" class="block w-full text-left px-4 py-2 hover:bg-gray-100">
+                    <button @click="logout"
+                        class="block w-full text-left px-4 py-2 hover:bg-gray-100 hover:cursor-pointer">
                         登出
                     </button>
                 </div>

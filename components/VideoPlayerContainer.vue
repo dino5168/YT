@@ -154,6 +154,29 @@ function timeToSeconds(timeStr: string): number {
         return 0
     }
 }
+const normalizeSubtitles = (data: any[]): SubtitleItem[] =>
+    data
+        .map((item, index) => {
+            return {
+                ...item,
+                en_text: typeof item.en_text === 'string' ? item.en_text : '',
+                zh_text: typeof item.zh_text === 'string' ? item.zh_text : '',
+            }
+        })
+        .filter((item, index) => {
+            const isValid =
+                typeof item.seq === 'number' &&
+                typeof item.start_time === 'string' &&
+                typeof item.end_time === 'string' &&
+                typeof item.en_text === 'string' &&
+                typeof item.zh_text === 'string'
+
+            if (!isValid) {
+                console.warn(`----字幕項目 ${index} 格式錯誤:`, item)
+            }
+
+            return isValid
+        })
 
 // 載入字幕檔 - 改為載入JSON格式
 onMounted(async () => {
@@ -177,23 +200,8 @@ onMounted(async () => {
         if (!Array.isArray(jsonData)) {
             throw new Error('字幕資料格式錯誤：不是陣列格式')
         }
+        const validSubtitles = normalizeSubtitles(jsonData)  // ✅ 直接使用 normalizeSubtitles
 
-        // 驗證每個字幕項目的格式
-        const validSubtitles = jsonData.filter((item, index) => {
-            const isValid = (
-                typeof item.seq === 'number' &&
-                typeof item.start_time === 'string' &&
-                typeof item.end_time === 'string' &&
-                typeof item.en_text === 'string' &&
-                typeof item.zh_text === 'string'
-            )
-
-            if (!isValid) {
-                console.warn(`字幕項目 ${index} 格式錯誤:`, item)
-            }
-
-            return isValid
-        })
 
         subtitles.value = validSubtitles
         loadStatus.value = `成功載入 ${validSubtitles.length} 個字幕`

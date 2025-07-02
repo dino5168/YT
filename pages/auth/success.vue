@@ -25,41 +25,44 @@
 <script setup lang="ts">
 
 import { useBaseUrl } from '#imports'
+import { AUTH_TOKEN_KEY, USER, MAX_AGE } from "~/utils/constants"
 const baseUrl = useBaseUrl()
+//取得 當前路由資訊（route object），包含 path、params、query、meta 等。
+const route = useRoute()
+//取得 路由控制物件（router instance），用來「跳轉頁面 / 操控路由」。
+const router = useRouter()
+
 
 definePageMeta({
     layout: 'auth'
 })
 
 
-const route = useRoute()
-const router = useRouter()
-
 onMounted(async () => {
+    //後端會回傳 token
     const token = route.query.token as string
     if (token) {
         // 儲存 token
-        const authToken = useCookie('auth_token', {
-            maxAge: 60 * 60 * 24 * 7, // 7 days
+        const authToken = useCookie(AUTH_TOKEN_KEY, {
+            maxAge: MAX_AGE, // 7 days
             httpOnly: false,
             secure: true,
             sameSite: 'lax'
         })
         authToken.value = token
-
-
-        // 使用 useApi 取得使用者資訊
+        // 使用 useApi 後端在驗證一次 ,取得使用者資訊 
         const { data, error } = await useApi<{ payload: any }>(`${baseUrl}/auth/verify`, {
             headers: {
                 Authorization: `Bearer ${token}`
             },
             method: "POST"
         })
+        // 將使用者資訊 填入 cookie
 
         if (error) {
             console.error('驗證失敗:', error)
         } else if (data) {
-            const user = useCookie('user', {
+            const user = useCookie(USER, {
                 maxAge: 60 * 60 * 24 * 7,
                 httpOnly: false,
                 secure: true,

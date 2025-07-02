@@ -18,17 +18,21 @@ declare global {
   }
 }
 
+const baseUrl = useBaseUrl();
+const config = useRuntimeConfig();
+
+const GOOGLE_REDIRECT_URI = config.GOOGLE_REDIRECT_URI;
+const GOOGLE_CLIENT_ID = config.GOOGLE_CLIENT_ID;
+
+//const GOOGLE_REDIRECT_URI =
+//import.meta.env.VITE_GOOGLE_REDIRECT_URI ||
+//"http://127.0.0.1:8000/auth/google/callback";
 export const useGoogleAuth = () => {
   const router = useRouter();
   const loading = ref(false);
   const errorMessage = ref("");
   const successMessage = ref("");
   //"http://127.0.0.1:8000/auth/google";
-  const GOOGLE_CLIENT_ID =
-    "440121911282-n1tkv3rtrfu9vnm63ajsrm709vc00h3l.apps.googleusercontent.com";
-  const GOOGLE_REDIRECT_URI =
-    import.meta.env.VITE_GOOGLE_REDIRECT_URI ||
-    "http://127.0.0.1:8000/auth/google/callback";
 
   const generateRandomString = (length: number): string => {
     const chars =
@@ -58,13 +62,11 @@ export const useGoogleAuth = () => {
     );
   };
 
+  //通知 server : 取得 Google OAuth 授權 URL
   const handleGoogleOAuthRedirect = async () => {
-    alert("handleGoogleOAuthRedirect");
-    const res = await fetch("http://127.0.0.1:8000/auth/google");
+    const res = await fetch(`${baseUrl}/auth/google`);
     const {auth_url} = await res.json();
     window.location.href = auth_url;
-    //const url = generateGoogleOAuthUrl();
-    //window.location.href = url;
   };
 
   //沒有使用
@@ -96,6 +98,7 @@ export const useGoogleAuth = () => {
     setTimeout(() => router.push("/dashboard"), 1500);
   };
 
+  //Google One Tap 登入功能（Google One Tap Sign-In），讓使用者可以透過彈出的提示快速登入 Google 帳號，不需要跳轉頁面或點按按鈕。
   const initGoogleOneTap = () => {
     if (typeof window === "undefined" || window.googleOneTapScriptLoaded)
       return;

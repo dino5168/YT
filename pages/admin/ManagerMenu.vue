@@ -47,7 +47,7 @@
                     </div>
                     <div>
                         <label class="text-white font-semibold block">次序:</label>
-                        <input v-model="editForm.order" type="text" class="w-full px-2 py-1 rounded" />
+                        <input v-model="editForm.sort_order" type="text" class="w-full px-2 py-1 rounded" />
                     </div>
                 </template>
 
@@ -66,19 +66,19 @@ import { useToast } from '@/composables/useToast' // ✅ 確保此檔案存在
 const { showToast } = useToast()
 
 const navItems = ref([])
-const selectedItem = ref<{ label: string; href?: string, id: string, type: string, nav_item_id: string, order: string } | null>(null)
-const editForm = ref({ label: '', href: '', id: '', type: '', nav_item_id: '', order: '' })
+const selectedItem = ref<{ label: string; href?: string, id: string, type: string, nav_item_id: string, sort_order: string } | null>(null)
+const editForm = ref({ label: '', href: '', id: '', type: '', nav_item_id: '', sort_order: '' })
 const baseUrl = useBaseUrl()
 const urlNavLinks = `${baseUrl}/nav/links`
 
-const handleSelect = (item: { label: string; href?: string, id: string, type: string, nav_item_id: string, order: string }) => {
+const handleSelect = (item: { label: string; href?: string, id: string, type: string, nav_item_id: string, sort_order: string }) => {
     selectedItem.value = item
     editForm.value = {
         id: item.id,
         type: item.type,
         label: item.label,
         nav_item_id: item.nav_item_id,
-        order: item.order,
+        sort_order: item.sort_order,
         href: item.href || '',
 
     }
@@ -100,13 +100,13 @@ const getBody = () => {
         return {
             label: editForm.value.label,
             href: editForm.value.href,
-            order: editForm.value.order
+            sort_order: editForm.value.sort_order
         }
     } else {
         return {
             label: editForm.value.label,
             href: editForm.value.href,
-            order: editForm.value.order,
+            sort_order: editForm.value.sort_order,
             nav_item_id: editForm.value.nav_item_id
 
         }
@@ -161,7 +161,8 @@ const dataAppendMain = async () => {
     })
 
     if (error) {
-        alert(`新增失敗：${error}`)
+        //alert(`新增失敗：${error}`)
+        showToast(`新增失敗：${error}`)
     } else {
         //alert(`新增成功：${JSON.stringify(data)}`)
         showToast("新增成功")

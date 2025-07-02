@@ -4,7 +4,7 @@
         <div class="relative w-full h-full">
             <!-- 播放按鈕覆蓋層 -->
             <div v-if="!isPlaying"
-                class="absolute inset-0 bg-gray-950/70 z-[9999] flex items-center justify-center rounded-lg">
+                class="absolute inset-0 bg-gray-950/70 z-[99] flex items-center justify-center rounded-lg">
                 <button @click="togglePlay"
                     class="text-white text-base md:text-xl px-4 py-2 md:px-6 md:py-3 bg-indigo-600 hover:cursor-pointer rounded-lg shadow-lg hover:bg-indigo-700 transition-colors">
                     ▶️ 播放

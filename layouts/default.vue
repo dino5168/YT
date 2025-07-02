@@ -1,6 +1,7 @@
 <template>
     <div class="min-h-screen flex flex-col bg-gray-100 text-gray-900">
         <!-- 導覽列 -->
+
         <header class="fixed top-0 left-0 right-0 z-9999 bg-white shadow px-6 py-4">
             <div class="flex items-center justify-between">
                 <!-- 網站名稱，可切換手機選單 -->
@@ -22,7 +23,7 @@
 
                 <div v-if="isLogin">
                     <ButtonImageCircle :image-url="userData">
-                    </ButtonImageCircle>;
+                    </ButtonImageCircle>
                 </div>
                 <div v-else>
                     <NuxtLink to="/auth/Login">登入</NuxtLink>

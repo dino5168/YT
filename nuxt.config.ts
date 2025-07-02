@@ -2,8 +2,13 @@
 export default defineNuxtConfig({
   compatibilityDate: "2025-05-15",
   devtools: {enabled: true},
+  ssr: false,
   css: ["@/assets/css/main.css"],
   runtimeConfig: {
+    JWT_SECRET_KEY: process.env.JWT_SECRET_KEY,
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+    GOOGLE_REDIRECT_URI: process.env.GOOGLE_REDIRECT_URI,
+
     public: {
       srtBaseUrl:
         process.env.NUXT_PUBLIC_SRT_BASE_URL || "http://localhost:8000/srt/",
@@ -19,4 +24,5 @@ export default defineNuxtConfig({
     "@nuxt/scripts",
     "@nuxt/ui",
   ],
+  plugins: ["~/plugins/test.server.ts"],
 });
