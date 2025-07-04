@@ -1,11 +1,11 @@
-export interface Code {
+export interface code {
   id: number;
-  category: string; // 代碼類別
-  code: string; // 代碼值
-  name: string; // 顯示名稱
-  sort_order: number; // 排序用
-  is_active: number; // 是否啟用（0 或 1）
-  description?: string | null; // 備註，可選或 null
-  created_at: string; // ISO 格式日期字串（DateTime）
-  updated_at: string; // ISO 格式日期字串（DateTime）
+  category: string;
+  code: string;
+  name: string;
+  sort_order?: number | null;
+  is_active?: boolean | null;
+  description?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
 }

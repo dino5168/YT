@@ -97,6 +97,7 @@ const props = defineProps<{
     columns: string[]
     columnDescriptions: string[]
     columnWidths?: Record<string, string> // 新增: 自定義列寬設定
+    pageSize?: number
 }>()
 
 const emit = defineEmits<{

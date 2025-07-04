@@ -4,10 +4,12 @@
             <label class="text-sm font-medium mr-3 whitespace-nowrap">選擇表格：</label>
             <ComboBoxApi v-model="selectedValue" v-model:label="selectedLabel" api-url="COMBO_TABLE_LIST"
                 placeholder="請選擇一個表格..." class="flex-1" />
+            <!--
             <button @click="onQuery"
                 class="px-2 py-1 bg-blue-900 text-sm text-white rounded-sm hover:cursor-pointer hover:bg-blue-700">
                 查詢
             </button>
+            -->
 
         </div>
         <!-- 新增的輸入欄位區塊 -->
@@ -15,9 +17,9 @@
             <label class="text-sm font-medium whitespace-nowrap">欄位名稱:</label>
             <label class="text-sm font-medium whitespace-nowrap">{{ fieldName }}</label>
             <label for="column-description" class="text-sm font-medium whitespace-nowrap">欄位描述：</label>
-            <input id="column-description" v-model="comment" type="text"
-                class="border border-gray-300 rounded px-2 py-1 text-sm w-40" placeholder="輸入內容" />
-            <button @click="onQuery"
+            <input id="column-description" v-model="comment" type="text" maxlength="50" ref="inputRef"
+                class="border border-gray-300 rounded px-2 py-1 text-sm w-80" placeholder="輸入內容" />
+            <button @click="onUpdateDesc"
                 class="px-2 py-1 bg-blue-900 text-sm text-white rounded-sm hover:cursor-pointer hover:bg-blue-700">
                 修改欄位描述
             </button>
@@ -34,7 +36,7 @@
                 <!-- 自定義操作欄位渲染 -->
                 <template #cell-操作="{ row }">
                     <div class="flex space-x-2">
-                        <button @click="onUpdateDesc(row)"
+                        <button @click="onSelectDesc(row)"
                             class="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 hover:cursor-pointer">
                             選取
                         </button>
@@ -50,12 +52,17 @@ import { ref, watch } from 'vue'
 import ComboBoxApi from '~/components/SelectList/ComboBoxApi.vue'
 import XTable from '~/components/Table/XTable.vue'
 import { useToast } from '@/composables/useToast' // ✅ 確保此檔案存在
+
+
+const inputRef = ref<HTMLInputElement | null>(null)
+
 const { showToast } = useToast()
 
 const baseUrl = useBaseUrl()
 
+const fieldNameInit = "__"
 const comment = ref('')
-const fieldName = ref('__')
+const fieldName = ref(fieldNameInit)
 
 // 定義 filteredData 以避免錯誤
 const filteredData = ref([])
@@ -134,20 +141,88 @@ const onQuery = async () => {
     }
 }
 
+
 // 監聽值的變化（可選）
 watch(selectedLabel, (newValue) => {
-    console.log('選中的值已改變:', newValue)
+    //console.log('選中的值已改變:', newValue)
+    fieldName.value = fieldNameInit
+    comment.value = ""
+    onQuery()
 })
 
-const onUpdateDesc = (row: any) => {
-    const jsonObject = {
-        "tableName": selectedLabel,
-        "fieldName": row.欄位名稱,
-        "desc": row.欄位描述
+type JsonObject = {
+    tableName: string
+    fieldName: string
+    comment: string
+}
+// 選取物件（你想存下最後選取的項目）
+const selectedObject = ref<JsonObject | null>(null)
+
+const onSelectDesc = (row: any) => {
+
+    const jsonObject: JsonObject = {
+        tableName: selectedLabel.value,
+        fieldName: row.欄位名稱,
+        comment: row.欄位描述
     }
     fieldName.value = jsonObject.fieldName
-    comment.value = jsonObject.desc
-    //post 
-    alert(jsonObject.desc)
+    comment.value = jsonObject.comment
+
+    selectedObject.value = jsonObject
+    inputRef.value?.focus()
+
+
+}
+
+
+async function addColumnComment() {
+    const apiUrl = `${baseUrl}/DBCreate/tableComment`;
+
+
+    const { data, error } = await useApi(
+        apiUrl,
+        {
+            method: "POST",
+            body: {
+                "table_name": selectedObject.value?.tableName,
+                "column_name": selectedObject.value?.fieldName,
+                "comment": comment.value,
+            },
+        }
+    );
+
+    if (error) {
+        //console.error("錯誤:", error);
+        showToast("更新失敗", "error")
+        return;
+    }
+
+    //console.log("成功:", data);
+    showToast("更新成功", "success")
+    // 更新成功後重新查詢
+    await onQuery()
+}
+
+// 呼叫範例
+
+const isPassCheck = (): boolean => {
+
+    if (fieldName.value.trim() === fieldNameInit) // 字串有空白就不會等於 '__'
+        return false
+    else
+        return true
+}
+
+const onUpdateDesc = () => {
+
+    if (isPassCheck()) {
+
+        addColumnComment();
+    } else {
+        showToast("請選取修改欄位", "warning")
+    }
+    //alert(selectedObject.value?.tableName)
+
+
 }
 </script>

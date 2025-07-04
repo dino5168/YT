@@ -2,7 +2,7 @@
     <div class="relative w-full" ref="root">
         <!-- 顯示已選取值 -->
         <button @click="toggleDropdown"
-            class="w-full text-left border text-sm rounded-md px-4 py-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            class="w-full text-left border text-sm rounded-md px-2 py-1 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
             {{ selectedLabel || placeholder }}
         </button>
 

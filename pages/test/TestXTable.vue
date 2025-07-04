@@ -1,45 +1,24 @@
 <template>
     <div class="p-4">
         <!-- 搜尋區域 -->
-        <div class="mb-4 bg-gray-100 p-4 rounded-lg">
+        <div class="mb-1 bg-gray-100 p-4 rounded-lg">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <!-- 代碼搜尋 -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">代碼搜尋</label>
-                    <input v-model="searchFilters.code" type="text" placeholder="輸入代碼關鍵字..."
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <FormInput label="代碼搜尋" :modelValue="searchFilters.code" placeholder="輸入代碼關鍵字...">
+                    </FormInput>
                 </div>
-
-                <!-- 類別篩選 -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">類別篩選</label>
-                    <select v-model="searchFilters.category"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="">全部類別</option>
-                        <option v-for="cat in uniqueCategories" :key="cat" :value="cat">
-                            {{ cat }}
-                        </option>
-                    </select>
-                </div>
-
                 <!-- 名稱搜尋 -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">名稱搜尋</label>
-                    <input v-model="searchFilters.name" type="text" placeholder="輸入名稱關鍵字..."
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <FormInput label="名稱搜尋" :modelValue="searchFilters.name" placeholder="請輸入名稱...">
+                    </FormInput>
                 </div>
             </div>
 
             <!-- 搜尋按鈕和重置按鈕 -->
-            <div class="mt-4 flex space-x-2">
-                <button @click="applyFilters"
-                    class="px-2 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">
-                    搜尋
-                </button>
-                <button @click="resetFilters"
-                    class="px-2 py-1 bg-gray-600 text-white text-sm rounded hover:bg-gray-700">
-                    重置
-                </button>
+            <div class="mt-1 flex space-x-2">
+                <ButtonBlue @click="applyFilters">搜尋</ButtonBlue>
+                <ButtonGray @click="resetFilters">重置</ButtonGray>
             </div>
 
             <!-- 搜尋結果統計 -->
@@ -93,10 +72,7 @@
             <!-- 自定義操作欄位渲染 -->
             <template #cell-actions="{ row }">
                 <div class="flex space-x-2">
-                    <button @click.stop="handleEdit(row)"
-                        class="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700">
-                        修改
-                    </button>
+                    <ButtonBlue @click.stop="handleEdit(row)">修改</ButtonBlue>
                     <button @click.stop="handleDelete(row)"
                         class="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700">
                         刪除
@@ -109,8 +85,10 @@
 
 <script setup lang="ts">
 import XTable from '~/components/Table/XTable.vue'
-import type { Code } from '~/types/Code'
+//import type { code } from '~/types/code'
 import { onMounted, ref, computed } from 'vue'
+import { ButtonBlue, ButtonRed, ButtonGray } from '~/components/Buttons'
+import FormInput from '~/components/Form/FormInput.vue'
 
 const data = ref<any[]>([])
 const selectedRows = ref<number[]>([]) // 存儲選中的行 ID
