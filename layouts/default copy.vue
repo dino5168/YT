@@ -5,7 +5,11 @@
         <header class="fixed top-0 left-0 right-0 z-9999 bg-white shadow px-6 py-4">
             <div class="flex items-center justify-between">
                 <!-- 網站名稱，可切換手機選單 -->
-                 <!-- 手機版漢堡選單按鈕 -->
+                <div class="text-xl font-bold cursor-pointer select-none" @click="menuOpen = !menuOpen">
+                    🎬 多媒體語言學習
+                </div>
+                <DesktopNav :links="navLinks" />
+                <!-- 手機版漢堡選單按鈕 -->
                 <button class="sm:hidden text-gray-700" @click="menuOpen = !menuOpen">
                     <svg v-if="!menuOpen" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2"
                         viewBox="0 0 24 24">
@@ -15,11 +19,6 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
-                <div class="text-xl font-bold cursor-pointer select-none" @click="menuOpen = !menuOpen">
-                    🎬 多媒體語言學習
-                </div>
-                <DesktopNav :links="navLinks" />
-                
 
 
                 <div v-if="isLogin">

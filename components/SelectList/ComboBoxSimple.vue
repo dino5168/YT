@@ -2,14 +2,14 @@
     <div class="relative w-full" ref="root">
         <!-- 顯示已選取值 -->
         <button @click="toggleDropdown"
-            class="w-full text-left border rounded-md px-4 py-2 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            class="w-full text-left border text-sm rounded-md px-2 py-1 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
             {{ selectedLabel || placeholder }}
         </button>
 
         <!-- 下拉選單 -->
         <ul v-if="isOpen" class="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg">
             <li v-for="option in options" :key="option.value" @click="selectOption(option)"
-                class="px-4 py-2 cursor-pointer hover:bg-blue-100">
+                class="px-2 py-1 text-sm cursor-pointer hover:bg-blue-100">
                 {{ option.label }}
             </li>
         </ul>

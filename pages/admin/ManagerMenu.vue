@@ -228,8 +228,18 @@ const dataDelete = async () => {
 
 // ✅ 抽成一個函式
 const fetchNavItems = async () => {
-    const res = await fetch(urlNavLinks)
-    navItems.value = await res.json()
+    
+    //const res = await fetch(urlNavLinks)
+    //navItems.value = await res.json()
+    
+  const { data, error } = await useNavLinks()
+  if (error.value) {
+    console.error('載入 navLinks 失敗', error.value)
+    return
+  }
+
+  navItems.value = data.value || []
+    
 }
 
 onMounted(async () => {

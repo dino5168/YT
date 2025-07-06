@@ -55,9 +55,13 @@ const logout = async () => {
     const { data, error } = await useApi<{ payload: any }>(`${apibaseUrl}/auth/logout`, {
         method: "POST",
     })
+    
 
     // 跳轉到登入頁
-    router.push('/')
+   // router.push('/') : 只會部分更新 
+
+   //整頁 refresh
+   window.location.href = '/'
 
 }
 

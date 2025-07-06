@@ -89,14 +89,14 @@ const columnWidths = {
     id: '80px',
 }
 
-// 資料取得
+// 資料取得 http://localhost:8000/DBQuery/SELECT_USERS_ALL
 const fetchUsers = async () => {
     loading.value = true
     errorMessage.value = ''
 
     try {
         const token = useCookie('auth_token').value
-        const { data, error } = await useApi<User[]>(`${baseUrl}/query/users`, {
+        const { data, error } = await useApi<User[]>(`${baseUrl}/DBQuery/SELECT_USERS_ALL`, {
             headers: {
                 Authorization: `Bearer ${token}`,
                 'Cache-Control': 'no-cache',

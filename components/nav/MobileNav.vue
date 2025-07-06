@@ -1,6 +1,6 @@
 <template>
     <transition name="fade">
-        <nav v-if="menuOpen" class="sm:hidden mt-2 space-y-2 text-sm text-gray-700">
+        <nav v-if="menuOpen"  class="sm:hidden mt-2 space-y-2 text-sm text-gray-700 max-h-[80vh] overflow-y-auto">
             <template v-for="(link, index) in links" :key="index">
                 <!-- 一般連結 -->
                 <a v-if="!link.dropdown" :href="link.href"
