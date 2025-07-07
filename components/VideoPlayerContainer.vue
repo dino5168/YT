@@ -21,7 +21,7 @@
             enter-from-class="transform translate-x-full opacity-0" enter-to-class="transform translate-x-0 opacity-100"
             leave-from-class="transform translate-x-0 opacity-100"
             leave-to-class="transform translate-x-full opacity-0">
-            <div v-if="showSubtitles" class="w-full md:w-1/3 flex flex-col mt-4 md:mt-0 md:py-4">
+            <div v-if="showSubtitles" class="w-full md:w-1/3 flex flex-col h-140 mt-4 md:mt-0 md:py-4">
                 <div
                     class="bg-white shadow-lg rounded-sm border border-blue-900 flex flex-col md:ml-0 md:mx-0 md:mr-6 overflow-hidden transform transition-all duration-300 h-[300px] md:h-full">
 

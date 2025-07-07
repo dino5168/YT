@@ -1,12 +1,13 @@
 <template>
     <div class="flex-1 min-h-0 flex flex-col">
         <!-- 播放器與字幕顯示 - 優化 mobile 版本 -->
-        <div class="relative w-full h-full">
+        <div class="relative w-full h-full z-999">
             <!-- 播放按鈕覆蓋層 -->
             <div v-if="!isPlaying"
-                class="absolute inset-0 bg-gray-950/70 z-[99] flex items-center justify-center rounded-lg">
+                class="absolute inset-0 bg-gray-950/70 z-9999 flex items-center justify-center rounded-lg">
+                
                 <button @click="togglePlay"
-                    class="text-white text-base md:text-xl px-4 py-2 md:px-6 md:py-3 bg-indigo-600 hover:cursor-pointer rounded-lg shadow-lg hover:bg-indigo-700 transition-colors">
+                    class="text-gray-900 text-sm md:text-sm px-2 py-1 md:px-2 md:py-1 bg-indigo-600 hover:cursor-pointer rounded-lg shadow-lg hover:bg-indigo-700 transition-colors">
                     ▶️ 播放
                 </button>
             </div>
@@ -23,7 +24,7 @@
                     :style="{
                         left: `${position.x}px`,
                         top: `${position.y}px`,
-                        zIndex: 1000
+                        zIndex: 98
                     }" @mousedown="startDrag" @touchstart="startTouch">
 
                     <!-- 英文字幕 -->
@@ -233,7 +234,8 @@ const handleStateChange = (event: any) => {
         if (state === window.YT.PlayerState.PAUSED) {
             stopTrackingTime()
         } else if (state === window.YT.PlayerState.ENDED) {
-            alert("Player End")
+            //alert("Player End")
+            window.location.href = '/'
         }
     }
 }

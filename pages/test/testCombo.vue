@@ -5,11 +5,6 @@
             <label class="text-sm font-medium mr-3 whitespace-nowrap">選擇項目：</label>
             <ComboBoxApi v-model="selectedValue" api-url="COMBo_ROLE_LIST" placeholder="請選擇一個選項" class="flex-1" />
         </div>
-        <div class="flex items-center mb-4 w-64">
-            <label class="text-sm font-medium mr-3 whitespace-nowrap">選擇項目：</label>
-            <ComboBoxMutiApi v-model="mutiSelectedValues" api-url="COMBO_TABLE_LIST" placeholder="請選擇選項..."
-                :max-display-items="5" />
-        </div>
 
         <!-- 顯示選中的值 -->
         <div class="mt-4 p-3 bg-gray-100 rounded">

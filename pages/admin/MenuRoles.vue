@@ -9,6 +9,7 @@
             <ButtonBlue @click="toggleSelectAll(true)">全選</ButtonBlue>
             <ButtonGray @click="toggleSelectAll(false)">取消選取</ButtonGray>
             <ButtonRed @click="onUpdate()">確定修改</ButtonRed>
+            <ButtonRed @click="onTest()">測試</ButtonRed>
 
         </div>
         <!-- 完整選單表格 -->
@@ -51,7 +52,7 @@ const urlNavLinks = `${baseUrl}/nav/links`
 const toggleSelectAll = (flag: boolean) => {
 
     allMenuItems.value.forEach(item => {
-        console.log(item)
+        
         item.is_Selected = flag
     })
 
@@ -79,66 +80,127 @@ const onUpdate = async () => {
     })
 
 }
-// 載入資料並展開為平面結構
-onMounted(async () => {
-    const res = await fetch(urlNavLinks)
-    const data = await res.json()
 
-    const flattenedData: any[] = []
 
-    data.forEach((mainItem: any) => {
-        // 加入主選單
+
+
+// 將原始資料扁平化
+const flattenMenuData = (rawData: MenuItem[]): FlattenedMenuItem[] => {
+  const flattenedData: FlattenedMenuItem[] = []
+  
+  rawData.forEach((mainItem) => {
+    // 加入主選單
+    flattenedData.push({
+      is_Selected: mainItem.is_selected,
+      level: '主選單',
+      id: mainItem.id,
+      label: mainItem.label,
+      href: mainItem.href || '',
+      type: mainItem.type,
+      sort_order: mainItem.sort_order,
+      parent_label: '',
+      nav_item_id: mainItem.nav_item_id,
+    })
+
+    // 加入子選單
+    if (mainItem.dropdown && mainItem.dropdown.length > 0) {
+      mainItem.dropdown.forEach((subItem) => {
         flattenedData.push({
-            is_Selected: false, // ✅ 預設不選取
-            level: '主選單',
-            id: mainItem.id,
-            label: mainItem.label,
-            href: mainItem.href || '',
-            type: mainItem.type,
-            sort_order: mainItem.sort_order,
-            parent_label: '',
-            nav_item_id: mainItem.nav_item_id
+          is_Selected: subItem.is_selected,
+          level: '子選單',
+          id: subItem.id,
+          label: subItem.label,
+          href: subItem.href || '',
+          type: subItem.type,
+          sort_order: subItem.sort_order,
+          parent_label: mainItem.label,
+          nav_item_id: subItem.nav_item_id,
         })
+      })
+    }
+  })
 
-        // 加入子選單
-        if (mainItem.dropdown && mainItem.dropdown.length > 0) {
-            mainItem.dropdown.forEach((subItem: any) => {
-                flattenedData.push({
-                    is_Selected: false, // ✅ 預設不選取
-                    level: '子選單',
-                    id: subItem.id,
-                    label: subItem.label,
-                    href: subItem.href || '',
-                    type: subItem.type,
-                    sort_order: subItem.sort_order,
-                    parent_label: mainItem.label,
-                    nav_item_id: subItem.nav_item_id
-                })
-            })
-        }
-    })
+  return flattenedData
+}
 
-    // 按照主選單排序，然後按照子選單排序
-    allMenuItems.value = flattenedData.sort((a, b) => {
-        // 先按父選單排序
-        if (a.level === '主選單' && b.level === '主選單') {
-            return a.sort_order - b.sort_order
-        }
-        if (a.level === '主選單' && b.level === '子選單') {
-            return a.sort_order - (data.find((item: any) => item.label === b.parent_label)?.sort_order || 0)
-        }
-        if (a.level === '子選單' && b.level === '主選單') {
-            return (data.find((item: any) => item.label === a.parent_label)?.sort_order || 0) - b.sort_order
-        }
-        if (a.level === '子選單' && b.level === '子選單') {
-            const aParentSort = data.find((item: any) => item.label === a.parent_label)?.sort_order || 0
-            const bParentSort = data.find((item: any) => item.label === b.parent_label)?.sort_order || 0
-            if (aParentSort !== bParentSort) {
-                return aParentSort - bParentSort
-            }
-            return a.sort_order - b.sort_order
-        }
-        return 0
-    })
+// 排序邏輯
+const sortMenuItems = (flattenedData: FlattenedMenuItem[], rawData: MenuItem[]): FlattenedMenuItem[] => {
+  return flattenedData.sort((a, b) => {
+    // 主選單 vs 主選單
+    if (a.level === '主選單' && b.level === '主選單') {
+      return a.sort_order - b.sort_order
+    }
+    
+    // 主選單 vs 子選單
+    if (a.level === '主選單' && b.level === '子選單') {
+      const bParentSort = rawData.find((item) => item.label === b.parent_label)?.sort_order || 0
+      return a.sort_order - bParentSort
+    }
+    
+    // 子選單 vs 主選單
+    if (a.level === '子選單' && b.level === '主選單') {
+      const aParentSort = rawData.find((item) => item.label === a.parent_label)?.sort_order || 0
+      return aParentSort - b.sort_order
+    }
+    
+    // 子選單 vs 子選單
+    if (a.level === '子選單' && b.level === '子選單') {
+      const aParentSort = rawData.find((item) => item.label === a.parent_label)?.sort_order || 0
+      const bParentSort = rawData.find((item) => item.label === b.parent_label)?.sort_order || 0
+      
+      if (aParentSort !== bParentSort) {
+        return aParentSort - bParentSort
+      }
+      return a.sort_order - b.sort_order
+    }
+    
+    return 0
+  })
+}
+
+// 主要的資料處理函式
+const processMenuData = (rawData: MenuItem[]): FlattenedMenuItem[] => {
+  const flattenedData = flattenMenuData(rawData)
+  return sortMenuItems(flattenedData, rawData)
+}
+
+// 載入選單資料
+const loadMenuData = async (role_id): Promise<FlattenedMenuItem[]> => {
+  try {
+    const { data, error } = await useNavLinksRoleId(role_id)
+    
+    if (error.value) {
+      console.error('載入 menu 失敗', error.value)
+      throw new Error('載入選單失敗')
+    }
+    
+    const rawData = data.value || []
+    return processMenuData(rawData)
+  } catch (err) {
+    console.error('處理選單資料時發生錯誤:', err)
+    throw err
+  }
+}
+
+// 使用方式
+onMounted(async () => {
+  try {
+    allMenuItems.value = await loadMenuData("1")
+  } catch (error) {
+    // 處理錯誤，例如顯示錯誤訊息給使用者
+    console.error('載入選單失敗:', error)
+  }
 })
+
+const onTest = async () =>{
+
+  try {
+    allMenuItems.value = await loadMenuData(selectedValue.value)
+  } catch (error) {
+    // 處理錯誤，例如顯示錯誤訊息給使用者
+    console.error('載入選單失敗:', error)
+  }
+
+}
+
 </script>

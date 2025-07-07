@@ -1,6 +1,6 @@
 <template>
     <div class="min-h-screen bg-gray-100 p-6">
-        <h1 class="text-2xl font-bold mb-4">網站導覽樹狀結構-<span class="text-red-600">系統管理者使用請小心操作</span></h1>
+        <h1 class="text-2xl font-bold mb-4">網站導覽樹狀結構-<span class="text-red-600">系統管理者使用請小心操作-只新增系統功能需到角色指定選單</span></h1>
         <div class="flex space-x-2">
             <button class="bg-blue-900 font-bold px-2 py-1 hover:cursor-pointer rounded-sm text-white"
                 @click="dataAppendMain">新增主選單</button>
@@ -206,6 +206,7 @@ const getDeleteUrl = () => {
 //刪除資料
 const dataDelete = async () => {
     const deleteUrl = getDeleteUrl()
+    alert(deleteUrl)
 
     const token = useCookie('auth_token').value
     const { data, error } = await useApi(deleteUrl, {
@@ -232,7 +233,8 @@ const fetchNavItems = async () => {
     //const res = await fetch(urlNavLinks)
     //navItems.value = await res.json()
     
-  const { data, error } = await useNavLinks()
+  const { data, error } = await useNavLinksAllMenu()
+  
   if (error.value) {
     console.error('載入 navLinks 失敗', error.value)
     return
