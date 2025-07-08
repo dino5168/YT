@@ -17,15 +17,7 @@
     <div v-if="isRecording" class="text-red-500 flex items-center space-x-2">
       <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
       <span>錄音中...</span>
-      <span class="text-sm text-gray-500">{{ formatTime(recordingTime) }}</span>
     </div>
-
-    <!-- 波形顯示區域 -->
-    
-    <div v-show="isRecording" class="bg-gray-900 rounded-lg p-4">
-      <canvas ref="waveformCanvas" class="w-full h-20 border border-gray-700"></canvas>
-    </div>
-
 
     <!-- 試聽區域 -->
     <div v-if="audioUrl && !isRecording" class="pt-4 border-t">
@@ -75,104 +67,11 @@ const audioUrl = ref<string | null>(null)
 const uploading = ref(false)
 const uploadSuccess = ref(false)
 const uploadError = ref(false)
-const recordingTime = ref(0)
-const waveformCanvas = ref<HTMLCanvasElement | null>(null)
 const apibaseUrl = useBaseUrl()
 
 let mediaRecorder: MediaRecorder | null = null
 let audioChunks: Blob[] = []
 let currentAudioBlob: Blob | null = null
-let audioContext: AudioContext | null = null
-let analyser: AnalyserNode | null = null
-let dataArray: Uint8Array | null = null
-let recordingTimer: number | null = null
-let animationId: number | null = null
-
-const formatTime = (seconds: number) => {
-  const mins = Math.floor(seconds / 60)
-  const secs = seconds % 60
-  return `${mins}:${secs.toString().padStart(2, '0')}`
-}
-
-const setupAudioVisualization = (stream: MediaStream) => {
-  try {
-    audioContext = new (window.AudioContext || window.webkitAudioContext)()
-    analyser = audioContext.createAnalyser()
-    
-    const source = audioContext.createMediaStreamSource(stream)
-    source.connect(analyser)
-    
-    analyser.fftSize = 256
-    analyser.smoothingTimeConstant = 0.8
-    const bufferLength = analyser.frequencyBinCount
-    dataArray = new Uint8Array(bufferLength)
-    
-    // 等待 canvas 渲染完成
-    nextTick(() => {
-      if (!waveformCanvas.value) console.warn('❌ waveformCanvas is null')
-      if (!analyser) console.warn('❌ analyser is null')
-      if (!dataArray) console.warn('❌ dataArray is null')
-      setTimeout(() => {
-        drawWaveform()
-      }, 100)
-      //drawWaveform()
-    })
-  } catch (error) {
-    console.error('Error setting up audio visualization:', error)
-  }
-}
-
-const drawWaveform = () => {
-  if (!waveformCanvas.value || !analyser || !dataArray) {
-    console.log('Canvas or analyzer not ready')
-    return
-  }
-  
-  const canvas = waveformCanvas.value
-  const ctx = canvas.getContext('2d')!
-  
-  // 設置 canvas 實際尺寸
-  const rect = canvas.getBoundingClientRect()
-  canvas.width = rect.width * window.devicePixelRatio
-  canvas.height = rect.height * window.devicePixelRatio
-  ctx.scale(window.devicePixelRatio, window.devicePixelRatio)
-  
-  const draw = () => {
-    if (!isRecording.value || !analyser || !dataArray) return
-    
-    animationId = requestAnimationFrame(draw)
-    
-    analyser.getByteFrequencyData(dataArray)
-    
-    // 清除畫布
-    ctx.clearRect(0, 0, rect.width, rect.height)
-    
-    // 繪製背景
-    ctx.fillStyle = 'rgba(17, 24, 39, 1)' // bg-gray-900
-    ctx.fillRect(0, 0, rect.width, rect.height)
-    
-    const barWidth = (rect.width / dataArray.length) * 2.5
-    let barHeight
-    let x = 0
-    
-    for (let i = 0; i < dataArray.length; i++) {
-      barHeight = (dataArray[i] / 255) * rect.height * 0.8
-      
-      // 創建漸變色
-      const gradient = ctx.createLinearGradient(0, rect.height - barHeight, 0, rect.height)
-      gradient.addColorStop(0, '#10b981') // 綠色
-      gradient.addColorStop(0.5, '#3b82f6') // 藍色
-      gradient.addColorStop(1, '#8b5cf6') // 紫色
-      
-      ctx.fillStyle = gradient
-      ctx.fillRect(x, rect.height - barHeight, barWidth, barHeight)
-      
-      x += barWidth + 1
-    }
-  }
-  
-  draw()
-}
 
 const startRecording = async () => {
   try {
@@ -180,13 +79,9 @@ const startRecording = async () => {
     uploadSuccess.value = false
     uploadError.value = false
     audioUrl.value = null
-    recordingTime.value = 0
     
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
     mediaRecorder = new MediaRecorder(stream)
-    
-    // 設置音頻視覺化
-    setupAudioVisualization(stream)
     
     audioChunks = []
     
@@ -203,34 +98,10 @@ const startRecording = async () => {
       
       // 停止所有音軌
       stream.getTracks().forEach(track => track.stop())
-      
-      // 清理音頻上下文
-      if (audioContext) {
-        audioContext.close()
-        audioContext = null
-      }
-      
-      // 停止計時器
-      if (recordingTimer) {
-        clearInterval(recordingTimer)
-        recordingTimer = null
-      }
-      
-      // 停止動畫
-      if (animationId) {
-        cancelAnimationFrame(animationId)
-        animationId = null
-      }
     }
     
     mediaRecorder.start()
     isRecording.value = true
-    
-    // 開始計時
-    recordingTimer = setInterval(() => {
-      recordingTime.value += 1
-    }, 1000)
-    
   } catch (error) {
     console.error('Error starting recording:', error)
     alert('無法開始錄音，請確認麥克風權限')
@@ -271,6 +142,10 @@ const uploadAudio = async () => {
     
     if (response.ok) {
       uploadSuccess.value = true
+      // 可以選擇在成功後清除錄音
+      // setTimeout(() => {
+      //   discardRecording()
+      // }, 2000)
     } else {
       uploadError.value = true
     }
@@ -291,22 +166,12 @@ const discardRecording = () => {
   uploadSuccess.value = false
   uploadError.value = false
   uploading.value = false
-  recordingTime.value = 0
 }
 
 // 組件銷毀時清理資源
 onUnmounted(() => {
   if (audioUrl.value) {
     URL.revokeObjectURL(audioUrl.value)
-  }
-  if (recordingTimer) {
-    clearInterval(recordingTimer)
-  }
-  if (animationId) {
-    cancelAnimationFrame(animationId)
-  }
-  if (audioContext) {
-    audioContext.close()
   }
 })
 </script>

@@ -9,7 +9,7 @@
             <ButtonBlue @click="toggleSelectAll(true)">全選</ButtonBlue>
             <ButtonGray @click="toggleSelectAll(false)">取消選取</ButtonGray>
             <ButtonRed @click="onUpdate()">確定修改</ButtonRed>
-            <ButtonRed @click="onTest()">測試</ButtonRed>
+            <ButtonGreen @click="onQuery()">查詢</ButtonGreen>
 
         </div>
         <!-- 完整選單表格 -->
@@ -35,7 +35,7 @@
 import { ref, onMounted } from 'vue'
 import ComboBoxApi from '~/components/SelectList/ComboBoxApi.vue'
 import XTable from '~/components/Table/XTable.vue'
-import { ButtonBlue, ButtonGray, ButtonRed } from '~/components/Buttons'
+import { ButtonBlue, ButtonGray, ButtonRed ,ButtonGreen} from '~/components/Buttons'
 
 // 定義響應式數據來儲存選中的值
 const selectedValue = ref<string | number | null>(null)
@@ -192,7 +192,7 @@ onMounted(async () => {
   }
 })
 
-const onTest = async () =>{
+const onQuery = async () =>{
 
   try {
     allMenuItems.value = await loadMenuData(selectedValue.value)
