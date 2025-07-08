@@ -8,13 +8,13 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
                 <FormInput v-for="col in searchableColumns" :key="col" v-model="searchForm[col]"
                     :label="getColumnDescription(col)" />
-
             </div>
             <div class="mt-3 flex gap-2">
                 <ButtonBlue @click="searchData">查詢</ButtonBlue>
                 <ButtonGray @click="resetSearch">重置</ButtonGray>
                 <ButtonGreen @click="openAddModal">新增資料</ButtonGreen>
             </div>
+            
         </div>
 
 
@@ -71,6 +71,7 @@ import XTable from '~/components/Table/XTable.vue'
 import { useToast } from '@/composables/useToast' // ✅ 確保此檔案存在
 import FormInput from '~/components/Form/FormInput.vue'
 import { ButtonBlue, ButtonGray, ButtonGreen, ButtonYellow, ButtonRed } from '~/components/Buttons'
+
 const { showToast } = useToast()
 
 
@@ -95,7 +96,7 @@ const deleteTarget = ref<any>(null)
 
 // 計算屬性
 const editableColumns = computed(() => {
-    // 排除操作欄位和可能的 ID 欄位
+    // 排除操作欄位和可能的 ID 欄位 category_id is_active actions
     return columns.value.filter(col => col !== 'actions' && col !== 'id')
 })
 

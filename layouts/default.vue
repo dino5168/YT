@@ -38,7 +38,7 @@
         <div v-if="dropdownOpen" class="fixed inset-0 z-40" @click="dropdownOpen = false"></div>
 
         <!-- 主要內容 -->
-        <main class="flex-1 pt-16 px-4 sm:px-6 lg:px-8 bg-gray-200">
+        <main class="flex-1 pt-16 px-4 sm:px-6 lg:px-8 bg-gray-200 p-4">
             <slot />
         </main>
 
