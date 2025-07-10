@@ -16,7 +16,7 @@
                     </svg>
                 </button>
                 <div class="text-xl font-bold cursor-pointer select-none" @click="menuOpen = !menuOpen">
-                    🎬 多媒體語言學習
+                    🎬 多媒體英語學習
                 </div>
                 <DesktopNav :links="navLinks" />
                 

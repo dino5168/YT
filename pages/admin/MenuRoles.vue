@@ -59,27 +59,6 @@ const toggleSelectAll = (flag: boolean) => {
 }
 //const baseUrl = useBaseUrl()
 
-//通知 Server 端修改資料 : 先刪除然後新增
-const onUpdate = async () => {
-    if (!selectedValue.value)
-        return
-
-    const selectedItems = allMenuItems.value.filter(item => item.is_Selected)
-    const filter = selectedItems.map(({ type, id }) => ({ type, id }))
-    const payload = {
-        role_id: selectedValue.value,
-        menu_items: filter
-    }
-    //
-    const response = await fetch(`${baseUrl}/DBCreate/TABLE_INSERT_M/INSERT_NAV_ITEM_ROLES`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-    })
-
-}
 
 
 
@@ -202,5 +181,28 @@ const onQuery = async () =>{
   }
 
 }
+
+//通知 Server 端修改資料 : 先刪除然後新增
+const onUpdate = async () => {
+    if (!selectedValue.value)
+        return
+
+    const selectedItems = allMenuItems.value.filter(item => item.is_Selected)
+    const filter = selectedItems.map(({ type, id }) => ({ type, id }))
+    const payload = {
+        role_id: selectedValue.value,
+        menu_items: filter
+    }
+    //
+    const response = await fetch(`${baseUrl}/DBCreate/TABLE_INSERT_M/INSERT_NAV_ITEM_ROLES`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+    })
+
+}
+
 
 </script>
