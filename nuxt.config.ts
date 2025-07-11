@@ -8,6 +8,7 @@ export default defineNuxtConfig({
     JWT_SECRET_KEY: process.env.JWT_SECRET_KEY,
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     GOOGLE_REDIRECT_URI: process.env.GOOGLE_REDIRECT_URI,
+    API_BASE_URL: process.env.API_BASE_URL,
 
     public: {
       srtBaseUrl:

@@ -181,7 +181,7 @@ onMounted(() => {
 
   initGoogleOneTap();
 });
-
+//使用 Email 登入
 const handleEmailLogin = async () => {
   loading.value = true;
   errorMessage.value = "";
@@ -202,11 +202,31 @@ const handleEmailLogin = async () => {
     return;
   }
 
-  const token = useCookie("auth_token", {path: "/"});
-  const user = useCookie("user", {path: "/"});
+  const authToken = useCookie("auth_token");
+  authToken.value = data.token;
 
-  token.value = data.access_token;
-  user.value = data.user;
+  const user = useCookie("user", {path: "/"});
+  // 使用 useApi 後端在驗證一次 ,取得使用者資訊
+  const {vdata, verror} = await useApi<{payload: any}>(
+    `${baseUrl}/auth/verify`,
+    {
+      headers: {
+        Authorization: `Bearer ${data.token}`,
+      },
+      method: "POST",
+    }
+  );
+
+  if (verror) {
+    console.error("驗證失敗:", verror);
+    errorMessage.value = "登入後驗證失敗，請稍後再試";
+    loading.value = false;
+    return;
+  }
+  console.log("驗證成功:", vdata);
+
+  //token.value = data.token;
+  //user.value = data.user;
 
   successMessage.value = "登入成功！正在跳轉...";
   setTimeout(() => router.push("/"), 1000);

@@ -307,7 +307,7 @@ const handleSubmit = async () => {
 
     if (error) {
       console.error("註冊失敗:", error);
-      errorMessage.value = error || "註冊失敗，請稍後再試";
+      errorMessage.value = error.data?.message || "註冊失敗，請稍後再試";
       generateCaptcha();
       form.value.captcha = "";
       return;
@@ -319,7 +319,7 @@ const handleSubmit = async () => {
       form.value.captcha = "";
       return;
     }
-    alert("註冊成功！請前往您的信箱點擊驗證連結完成帳號啟用");
+
     // 註冊成功，導向登入頁面
     await navigateTo("/auth/login?registered=true");
   } catch (err) {
