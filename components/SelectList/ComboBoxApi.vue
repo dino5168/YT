@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import {ref, computed, onMounted, watch, nextTick} from "vue";
+import {ref, computed, onMounted, watch, nextTick, onBeforeUnmount} from "vue";
 import {onClickOutside} from "@vueuse/core";
 import type {Option} from "~/types/Option";
 
@@ -34,6 +34,7 @@ const props = defineProps<{
   apiUrl: string;
   placeholder?: string;
 }>();
+
 const emit = defineEmits<{
   "update:modelValue": [value: string | number | null];
   "update:label": [label: string];
@@ -49,6 +50,39 @@ const selectedLabel = computed(() => {
   return match?.label ?? "";
 });
 
+// 計算下拉選單位置
+const updateDropdownPosition = () => {
+  if (!isOpen.value || !root.value) return;
+
+  const button = root.value.querySelector("button");
+  if (button) {
+    const rect = button.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+    const dropdownHeight = 240; // max-h-60 約等於 240px
+
+    // 判斷是否要向上展開
+    const spaceBelow = viewportHeight - rect.bottom;
+    const spaceAbove = rect.top;
+    const shouldOpenUpward =
+      spaceBelow < dropdownHeight && spaceAbove > spaceBelow;
+
+    dropdownStyle.value = {
+      position: "fixed",
+      top: shouldOpenUpward
+        ? `${rect.top - dropdownHeight}px`
+        : `${rect.bottom}px`,
+      left: `${rect.left}px`,
+      width: `${rect.width}px`,
+      maxHeight: shouldOpenUpward
+        ? `${Math.min(dropdownHeight, spaceAbove - 10)}px`
+        : `${Math.min(dropdownHeight, spaceBelow - 10)}px`,
+    };
+  }
+};
+
+// 滾動事件監聽器
+let scrollListener: (() => void) | null = null;
+
 const toggleDropdown = () => {
   isOpen.value = !isOpen.value;
 };
@@ -63,7 +97,7 @@ onClickOutside(root, () => {
   isOpen.value = false;
 });
 
-// 載入選項資料 (保持你原本邏輯)
+// 載入選項資料
 onMounted(async () => {
   try {
     const apiUrl = `${useBaseUrl()}/DBQuery/${props.apiUrl}`;
@@ -75,20 +109,33 @@ onMounted(async () => {
   }
 });
 
-// 監聽 isOpen，開啟時計算下拉位置 (相對於 button)
+// 監聽 isOpen 變化
 watch(isOpen, async (open) => {
-  if (open && root.value) {
+  if (open) {
     await nextTick();
-    const button = root.value.querySelector("button");
-    if (button) {
-      const rect = button.getBoundingClientRect();
-      dropdownStyle.value = {
-        position: "fixed",
-        top: `${rect.bottom}px`,
-        left: `${rect.left}px`,
-        width: `${rect.width}px`,
-      };
+    updateDropdownPosition();
+
+    // 添加滾動監聽器
+    scrollListener = () => {
+      updateDropdownPosition();
+    };
+    window.addEventListener("scroll", scrollListener, true); // 使用 capture 模式
+    window.addEventListener("resize", scrollListener);
+  } else {
+    // 移除滾動監聽器
+    if (scrollListener) {
+      window.removeEventListener("scroll", scrollListener, true);
+      window.removeEventListener("resize", scrollListener);
+      scrollListener = null;
     }
+  }
+});
+
+// 組件卸載時清理監聽器
+onBeforeUnmount(() => {
+  if (scrollListener) {
+    window.removeEventListener("scroll", scrollListener, true);
+    window.removeEventListener("resize", scrollListener);
   }
 });
 </script>

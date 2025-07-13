@@ -10,8 +10,8 @@
       :column-descriptions="columnDescriptions"
       :column-widths="{
         id: '80px',
-        text: '350px',
-        actions: '350px',
+        text: '400px',
+        actions: '250px',
       }"
       :page-size="20">
       <!-- 編號 -->
@@ -21,14 +21,14 @@
 
       <!-- 支援 inline 編輯的文字欄 -->
       <template #cell-text="{row}">
-        <div v-if="row.isEditing">
+        <div v-if="row.isEditing" :key="`edit-${row.id}`">
           <textarea
             v-model="row.text"
             rows="3"
             class="border px-2 py-1 rounded w-full resize-y leading-snug"
             placeholder="輸入文字..."></textarea>
         </div>
-        <div v-else>
+        <div v-else :key="`view-${row.id}`">
           <span class="text-gray-800 whitespace-pre-line">{{ row.text }}</span>
         </div>
       </template>
@@ -36,6 +36,7 @@
       <!-- 操作欄：ComboBox + 試聽 + 編輯 / 確定 + 刪除 -->
       <template #cell-actions="{row}">
         <div class="flex items-center space-x-2">
+          <label class="w-30">選取聲音</label>
           <ComboBoxApi
             v-model="row.selectedValue"
             v-model:label="row.selectedLabel"
@@ -47,7 +48,7 @@
           </ButtonGreen>
 
           <template v-if="row.isEditing">
-            <ButtonRed class="min-w-[80px]" @click="() => saveEdit(row)">
+            <ButtonRed class="min-w-[60px]" @click="() => saveEdit(row)">
               確定
             </ButtonRed>
           </template>
@@ -57,7 +58,7 @@
             </ButtonBlue>
           </template>
 
-          <ButtonRed class="min-w-[80px]" @click="() => onDeleteRow(row)">
+          <ButtonRed class="min-w-[60px]" @click="() => onDeleteRow(row)">
             刪除
           </ButtonRed>
         </div>
