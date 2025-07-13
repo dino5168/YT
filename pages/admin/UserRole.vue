@@ -1,23 +1,6 @@
 <template>
   <div class="p-4 space-y-4">
     <h1 class="text-gray-900 font-bold">使用者角色設定</h1>
-    <div>
-      <FormDate
-        class="w-56"
-        label="選取日期"
-        v-model="searchDate"
-        minDate="2025-07-02"
-        maxDate="2025-07-08">
-      </FormDate>
-
-      <FormEmail
-        class="w-96"
-        label="電子郵件"
-        v-model="searchEmail"
-        placeholder="請輸入電子郵件...">
-      </FormEmail>
-      <ButtonBlue @click="onTest">測試</ButtonBlue>
-    </div>
 
     <XTable
       :columns="columns"
@@ -58,6 +41,14 @@
             class="form-checkbox h-5 w-5 text-green-600" />
           <span :class="row.is_active ? 'text-green-600' : 'text-red-600'">
             {{ row.is_active ? "啟用" : "停用" }}
+          </span>
+        </label>
+      </template>
+
+      <template #cell-email_verified="{row}">
+        <label class="inline-flex items-center">
+          <span :class="row.email_verified ? 'text-green-600' : 'text-red-600'">
+            {{ row.email_verified ? "是" : "否" }}
           </span>
         </label>
       </template>
@@ -174,6 +165,8 @@ const get_user_data = async () => {
       "updated_at",
       "role_id",
       "locked_until",
+      "last_login_at",
+      "user_token",
     ];
     const addFields = [
       {role: "角色"},

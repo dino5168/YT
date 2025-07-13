@@ -107,11 +107,9 @@ const userData = computed(() => {
     parsedUser =
       typeof user.value === "string" ? JSON.parse(user.value) : user.value;
   } catch (e) {
-    console.error("Failed to parse user cookie:", e);
     return null;
   }
-  console.log("----------------------------");
-  console.log(parsedUser?.avatar_url);
+
   if (!parsedUser || !parsedUser.avatar_url) {
     return "/default-avatar.png"; // 如果沒有 avatar_url，返回 null
   }
