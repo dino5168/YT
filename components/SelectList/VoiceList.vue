@@ -1,23 +1,28 @@
 <template>
   <div class="p-4">
     <div class="flex items-center space-x-2 mb-2">
-      <label
-        for="voiceSelect"
-        class="text-sm font-medium text-gray-700 w-24 shrink-0">
-        選擇語音
-      </label>
-      <select
-        id="voiceSelect"
-        v-model="selectedVoice"
-        class="block w-80 p-2 text-sm border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200">
-        <option value="" disabled>請選擇 voice_id</option>
-        <option
-          v-for="voice in voices"
-          :key="voice.voice_id"
-          :value="voice.voice_id">
-          {{ voice.voice_id }}
-        </option>
-      </select>
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+        <!-- Label -->
+        <label
+          for="voiceSelect"
+          class="text-sm font-medium text-gray-700 w-24 shrink-0">
+          選擇語音
+        </label>
+
+        <!-- ComboBox + 按鈕 -->
+        <div class="flex flex-1 gap-2 items-center">
+          <ComboBoxApi
+            v-model="selectedValue"
+            v-model:label="selectedLabel"
+            api-url="CODES_SAMPLE_VOICE_LIST"
+            placeholder="請選擇聲音..."
+            class="min-w-[280px] sm:max-w-xs" />
+
+          <ButtonGreen class="min-w-[80px]" @click="() => onTestListen(row)">
+            試聽
+          </ButtonGreen>
+        </div>
+      </div>
       <button
         class="bg-blue-800 px-2 py-1 text-sm text-white hover:cursor-pointer rounded-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
         @click="postMessage"
@@ -30,9 +35,9 @@
       </button>
 
       <div
-        v-if="selectedVoice"
+        v-if="selectedLabel"
         class="p-2 border rounded text-sm text-gray-600 bg-gray-50">
-        ✅ 你選擇的是：<strong>{{ selectedVoice }}</strong>
+        ✅ 你選擇的是：<strong>{{ selectedLabel }}</strong>
       </div>
     </div>
 
@@ -61,10 +66,21 @@
       </textarea>
     </div>
   </div>
+  <!-- 隱藏的 audio 播放器 -->
+  <audio ref="audioRef" preload="auto" class="hidden" />
 </template>
 
 <script setup lang="ts">
 import {ref, onMounted} from "vue";
+import ComboBoxApi from "~/components/SelectList/ComboBoxApi.vue";
+import {ButtonGreen, ButtonRed, ButtonBlue} from "~/components/Buttons";
+const selectedValue = ref("");
+const selectedLabel = ref("");
+const baseUrl = useBaseUrl();
+
+const fetchUrl = `${baseUrl}/voices/tts`;
+
+const audioRef = ref<HTMLAudioElement | null>(null);
 
 interface Voice {
   voice_id: string;
@@ -78,19 +94,18 @@ const selectedVoice = ref("");
 const messageText = ref("Hello.\nI am Dino.\nNice to meet you. How are you?");
 const isLoading = ref(false); // 新增 loading 狀態
 
-const baseUrl = useBaseUrl();
-const fetchUrl = `${baseUrl}/voices/tts`;
-
 const postMessage = async () => {
-  if (!selectedVoice.value || !messageText.value.trim()) {
+  if (!selectedValue.value || !messageText.value.trim()) {
     alert("請選擇語音並輸入內容");
     return;
   }
 
+  alert(selectedValue.value);
+
   isLoading.value = true; // 開始 loading
 
   const payload = {
-    voice_id: selectedVoice.value,
+    voice_id: selectedValue.value,
     text: messageText.value.trim(),
   };
 
@@ -128,4 +143,27 @@ onMounted(async () => {
     console.error("fetch 失敗:", err);
   }
 });
+function extractName(label: string): string {
+  // 以 "-" 分割，取第一段
+  return label.split("-")[0];
+}
+// 播放試聽音訊
+const onTestListen = (row: any) => {
+  if (!selectedValue || !selectedLabel) {
+    alert("請先選擇聲音");
+    return;
+  }
+  const label_voice = selectedLabel.value.split("-")[0];
+
+  const url = `${baseUrl}/sample_voice/${selectedValue.value}_${label_voice}.mp3`;
+  audioRef.value?.pause();
+  audioRef.value!.src = url;
+
+  nextTick(() => {
+    audioRef.value?.load();
+    audioRef.value?.play().catch((err) => {
+      console.error("播放失敗：", err);
+    });
+  });
+};
 </script>

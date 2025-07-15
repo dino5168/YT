@@ -113,6 +113,7 @@ const onTestListen = (row: any) => {
     return;
   }
   const url = `${baseUrl}/sample_voice/${row.selectedValue}_${row.selectedLabel}.mp3`;
+
   audioRef.value?.pause();
   audioRef.value!.src = url;
 

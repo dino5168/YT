@@ -22,12 +22,16 @@
     "better-sqlite3": "^11.10.0",
     "eslint": "^9.29.0",
     "lucide-vue-next": "^0.515.0",
-    "mermaid": "^11.8.0",
+    "markdown-it": "^14.1.0",
+    "mermaid": "^11.8.1",
     "nuxt": "^3.17.5",
     "tailwindcss": "^4.1.10",
     "typescript": "^5.8.3",
     "vue": "^3.5.16",
     "vue-router": "^4.5.1",
     "vue3-google-login": "^2.0.33"
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.16"
   }
 }

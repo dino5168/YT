@@ -23,7 +23,7 @@
           @loadedmetadata="onLoadedMetadata"
           @error="onAudioError">
           <source
-            src="http://localhost:8000/story/story.mp3"
+            src="http://localhost:8000/note/mp3/note.mp3"
             type="audio/mpeg" />
           您的瀏覽器不支援音訊播放
         </audio>
@@ -171,7 +171,7 @@ async function loadSubtitles() {
     error.value = "";
 
     const response = await $fetch<string>(
-      "http://localhost:8000/story/story.srt",
+      "http://localhost:8000/note/srt/note.srt",
       {
         method: "GET",
         parseResponse: (txt) => txt,
