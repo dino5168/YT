@@ -77,6 +77,8 @@ import {useNavLinks} from "#imports";
 
 const menuOpen = ref(false);
 const dropdownOpen = ref(false);
+const user = useCookie("user");
+const authToken = useCookie("auth_token");
 
 // 使用 useNavLinks 來獲取導航連結
 const {data: navLinksData, pending, error} = await useNavLinks();
@@ -93,9 +95,6 @@ const navLinks = computed(() => {
 if (error.value) {
   console.error("Failed to load navigation links:", error.value);
 }
-
-const user = useCookie("user");
-const authToken = useCookie("auth_token");
 
 const isLogin = computed(() => !!authToken.value && !!user.value);
 // 創建一個 computed 來正確解析用戶數據
