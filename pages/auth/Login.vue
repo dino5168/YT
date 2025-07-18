@@ -95,7 +95,7 @@
                 aria-label="google 登入">
                 <img
                   src="/assets/icons/google.svg"
-                  alt="Facebook"
+                  alt="Google"
                   class="w-5 h-5 mr-2" />
                 Google
               </button>
@@ -186,7 +186,7 @@ const handleEmailLogin = async () => {
   loading.value = true;
   errorMessage.value = "";
 
-  const {data, error} = await useApi(loginUrl, {
+  const {data, error} = await useApi<any>(loginUrl, {
     method: "POST",
     body: {
       email: email.value,
@@ -207,7 +207,7 @@ const handleEmailLogin = async () => {
 
   const user = useCookie("user", {path: "/"});
   // 使用 useApi 後端在驗證一次 ,取得使用者資訊
-  const {vdata, verror} = await useApi<{payload: any}>(
+  const {data: vdata, error: verror} = await useApi<any>(
     `${baseUrl}/auth/verify`,
     {
       headers: {

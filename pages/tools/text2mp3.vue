@@ -22,7 +22,7 @@
             placeholder="請選擇聲音..."
             class="min-w-[280px] sm:max-w-xs" />
 
-          <ButtonGreen class="min-w-[80px]" @click="() => onTestListen(row)">
+          <ButtonGreen class="min-w-[80px]" @click="() => onTestListen()">
             試聽
           </ButtonGreen>
         </div>
@@ -45,20 +45,6 @@
       </div>
     </div>
 
-    <!-- 全域 Loading 覆蓋層 -->
-    <div
-      v-if="isLoading"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div
-        class="bg-white p-6 rounded-lg shadow-lg flex items-center space-x-3">
-        <div
-          class="animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
-        <span class="text-lg font-medium text-gray-700"
-          >正在產製語音，請稍候...</span
-        >
-      </div>
-    </div>
-
     <div>
       <textarea
         id="message"
@@ -72,6 +58,7 @@
   </div>
   <!-- 隱藏的 audio 播放器 -->
   <audio ref="audioRef" preload="auto" class="hidden" />
+  <GlobalLoading :visible="isLoading" message="正在產製語音，請稍候..." />
 </template>
 
 <script setup lang="ts">
@@ -80,6 +67,7 @@ import ComboBoxApi from "~/components/SelectList/ComboBoxApi.vue";
 import {ButtonGreen, ButtonRed, ButtonBlue} from "~/components/Buttons";
 import {FormInputHorizontal} from "~/components/Form";
 import {useToast} from "~/composables/useToast"; // 假設你把這段放在 composables/useToast.ts
+import GlobalLoading from "~/components/Loading/GlobalLoading.vue";
 
 const {showToast} = useToast();
 const baseUrl = useBaseUrl();
@@ -161,7 +149,7 @@ function extractName(label: string): string {
   return label.split("-")[0];
 }
 // 播放試聽音訊
-const onTestListen = (row: any) => {
+const onTestListen = () => {
   if (!selectedValue || !selectedLabel) {
     alert("請先選擇聲音");
     return;
