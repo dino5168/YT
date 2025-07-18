@@ -123,7 +123,8 @@
 import {ref, nextTick} from "vue";
 import ComboBoxApi from "~/components/SelectList/ComboBoxApi.vue";
 import {ButtonGreen, ButtonRed, ButtonBlue} from "~/components/Buttons";
-import XTable_S from "~/components/table/XTable_S";
+// Update the import path to the correct location of XTable_S.vue
+import XTable_S from "~/components/Table/XTable_S.vue";
 
 const baseUrl = useBaseUrl();
 const audioRef = ref<HTMLAudioElement | null>(null);
@@ -140,6 +141,7 @@ const voiceData = ref([
     isEditing: false,
     imageFile: null as File | null,
     imagePreview: null as string | null,
+    imageName: null, // ✅ 新增
   },
   {
     id: 2,
@@ -149,6 +151,7 @@ const voiceData = ref([
     isEditing: false,
     imageFile: null as File | null,
     imagePreview: null as string | null,
+    imageName: null, // ✅ 新增
   },
   {
     id: 3,
@@ -158,6 +161,7 @@ const voiceData = ref([
     isEditing: false,
     imageFile: null as File | null,
     imagePreview: null as string | null,
+    imageName: null, // ✅ 新增
   },
 ]);
 
@@ -254,6 +258,7 @@ const onAppendRow = () => {
     isEditing: true, // 新增後直接開啟編輯模式
     imageFile: null,
     imagePreview: null,
+    imageName: null, // ✅ 新增
   });
 };
 
@@ -278,7 +283,6 @@ const onPostApi = async () => {
       const imageName = imageFile ? `row_${row.id}_${imageFile.name}` : null;
 
       // 記錄 imageName（後端要對應）
-      row.imageName = imageName;
 
       return {
         id: row.id,
@@ -286,7 +290,7 @@ const onPostApi = async () => {
         selectedValue: row.selectedValue,
         selectedLabel: row.selectedLabel,
         hasImage: !!imageFile,
-        imageName,
+        imageName: row.imageName,
       };
     });
 
@@ -307,10 +311,16 @@ const onPostApi = async () => {
       voiceData.value.filter((r) => r.imageFile).map((r) => r.imageName)
     );
 
-    // 3. 送出 API
+    // 如果 useApi 有問題，可以暫時用原生 fetch 測試
+    const token = useCookie("auth_token").value;
+
     const response = await fetch(`${baseUrl}/mp4/voice-data`, {
       method: "POST",
       body: formData,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Cache-Control": "no-cache",
+      },
     });
 
     if (response.ok) {

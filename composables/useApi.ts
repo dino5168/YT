@@ -1,39 +1,35 @@
-export async function useApi<T = any>(
+export async function useApi<T>(
   url: string,
   options: {
     method?: string;
-    body?: Record<string, any>;
+    body?: BodyInit | Record<string, any>;
     headers?: HeadersInit;
-  } = {}
+  }
 ): Promise<{data: T | null; error: string | null}> {
   try {
-    const res = await fetch(url, {
+    const isFormData = options.body instanceof FormData;
+
+    const response = await fetch(url, {
       method: options.method || "GET",
-      headers: {
-        "Content-Type": "application/json",
-        ...(options.headers || {}),
-      },
-      body: options.body ? JSON.stringify(options.body) : undefined,
-      credentials: "include", // 這一行是重點，送出 cookie
+      body: isFormData
+        ? (options.body as FormData)
+        : JSON.stringify(options.body),
+      headers: isFormData
+        ? options.headers // 不要加 Content-Type，瀏覽器自動處理
+        : {
+            "Content-Type": "application/json",
+            ...(options.headers || {}),
+          },
     });
 
-    const json = await res.json();
-
-    if (!res.ok) {
-      return {
-        data: null,
-        error: json.detail || "發生錯誤",
-      };
+    if (!response.ok) {
+      const errText = await response.text();
+      return {data: null, error: `HTTP ${response.status}: ${errText}`};
     }
 
-    return {
-      data: json,
-      error: null,
-    };
+    const data = await response.json();
+    return {data, error: null};
   } catch (err: any) {
-    return {
-      data: null,
-      error: err.message || "網路請求失敗",
-    };
+    return {data: null, error: err.message || "Unknown error"};
   }
 }
