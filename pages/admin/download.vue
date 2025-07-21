@@ -33,17 +33,21 @@ const message = ref("");
 const error = ref("");
 function extractYouTubeVideoId(url: string): string | null {
   const match = url.match(/[?&]v=([^&]+)/);
-  return match ? match[1] : null;
+  return match ? match[1] : url;
 }
 const submit = async () => {
   message.value = "";
   error.value = "";
   isLoading.value = true; //
   const video_id = extractYouTubeVideoId(videoId.value);
+
   try {
+    const token = useCookie("auth_token").value;
+
     const res = await fetch(`${apibaseUrl}/admin/download`, {
       method: "POST",
       headers: {
+        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({video_id: video_id}),
