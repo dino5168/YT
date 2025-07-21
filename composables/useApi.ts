@@ -4,7 +4,7 @@ export async function useApi<T>(
     method?: string;
     body?: BodyInit | Record<string, any>;
     headers?: HeadersInit;
-  }
+  } = {} // 加上預設值 = {}
 ): Promise<{data: T | null; error: string | null}> {
   try {
     const isFormData = options.body instanceof FormData;

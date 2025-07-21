@@ -17,10 +17,12 @@ export function useXTable(
   const loadSchema = async () => {
     const result = await useApi(schemaUrl);
     const meta = result?.data || [];
-    rawColumns.value = meta.map((item: any) => item.column_name);
-    rawDescriptions.value = meta.map(
-      (item: any) => item.comment || item.column_name
-    );
+    rawColumns.value = Array.isArray(meta)
+      ? meta.map((item: any) => item.column_name)
+      : [];
+    rawDescriptions.value = Array.isArray(meta)
+      ? meta.map((item: any) => item.comment || item.column_name)
+      : [];
 
     // 將過濾邏輯放這裡，並可在外部隨時更改 excludeColumns 再呼叫 loadSchema 重新套用
     applyFilter();
@@ -28,7 +30,7 @@ export function useXTable(
 
   const loadData = async () => {
     const result = await useApi(dataUrl);
-    tableData.value = result?.data || [];
+    tableData.value = Array.isArray(result?.data) ? result.data : [];
   };
 
   // 過濾邏輯抽成函式
