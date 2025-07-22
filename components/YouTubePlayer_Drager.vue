@@ -1,57 +1,46 @@
 <template>
-
-    <div class="flex-1 min-h-0 flex flex-col space-y-4">
-        <!-- 播放器與字幕顯示 -->
-        <div class="relative aspect-video w-full md:flex-1 md:min-h-0">
+    <div class="flex-1 min-h-0 flex flex-col">
+        <!-- 播放器與字幕顯示 - 優化 mobile 版本 -->
+        <div class="relative w-full h-full z-999">
+            <!-- 播放按鈕覆蓋層 -->
             <div v-if="!isPlaying"
-                class="absolute inset-0 h-screen bg-gray-950/70 z-8999 flex items-center justify-center">
+                class="absolute inset-0 bg-gray-950/70 z-9999 flex items-center justify-center rounded-lg">
+                
                 <button @click="togglePlay"
-                    class="text-white text-xl px-6 py-3 bg-indigo-600 hover:cursor-pointer rounded">▶️ 播放</button>
+                    class="text-gray-900 text-sm md:text-sm px-2 py-1 md:px-2 md:py-1 bg-indigo-600 hover:cursor-pointer rounded-lg shadow-lg hover:bg-indigo-700 transition-colors">
+                    ▶️ 播放
+                </button>
             </div>
 
-            <div id="youtube-player" class="w-full h-[560px]  lg:h-[560px]  overflow-hidden"></div>
-            <!--
-            <div class="relative w-full aspect-video h-[280px] lg:h-[560px]">
-                <div id="youtube-player" class="absolute inset-0 w-full h-full overflow-hidden"></div>
+            <!-- YouTube 播放器容器 - 完全填滿父容器 -->
+            <div class="w-full h-full bg-black rounded-lg overflow-hidden">
+                <div id="youtube-player" class="w-full h-full"></div>
             </div>
-            -->
-            <!--字幕顯示 可以 Drag-->
+
+            <!-- 字幕顯示 - 可拖拽，mobile 優化 -->
             <transition name="fade">
                 <div v-if="activeSubtitle" ref="subtitleBox"
-                    class="absolute cursor-move bg-black/70 text-white px-4 py-2 rounded text-center text-lg max-w-xl space-y-1 select-none"
+                    class="absolute cursor-move bg-black/80 text-white px-2 py-1 md:px-4 md:py-2 rounded text-center max-w-[95%] md:max-w-xl space-y-1 select-none shadow-lg"
                     :style="{
                         left: `${position.x}px`,
                         top: `${position.y}px`,
-                        zIndex: 1000
-                    }" @mousedown="startDrag">
-                    <!-- 顯示英文字幕 -->
-                    <p v-if="activeSubtitle.en_text" class="text-blue-400 text-2xl font-semibold">
+                        zIndex: 98
+                    }" @mousedown="startDrag" @touchstart="startTouch">
+
+                    <!-- 英文字幕 -->
+                    <p v-if="activeSubtitle.en_text"
+                        class="text-blue-300 text-xs sm:text-sm md:text-lg lg:text-xl font-medium leading-tight">
                         {{ activeSubtitle.en_text }}
                     </p>
-                    <!-- 顯示中文字幕 -->
-                    <p v-if="activeSubtitle.zh_text" class="text-white text-2xl font-semibold">
+
+                    <!-- 中文字幕 -->
+                    <p v-if="activeSubtitle.zh_text"
+                        class="text-white text-xs sm:text-sm md:text-lg lg:text-xl font-medium leading-tight">
                         {{ activeSubtitle.zh_text }}
                     </p>
                 </div>
             </transition>
-
         </div>
-
-        <!-- 控制區 -->
-        <div class="flex items-center gap-4 flex-wrap">
-            <PlayerControls class="hidden lg:block" />
-            <!--
-            <button class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
-                @click="togglePlay">
-                {{ isPlaying ? '⏸️ 暫停' : '▶️ 播放' }}
-            </button>
-            <button class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition" @click="reset">
-                🔄 重置
-            </button>
-            -->
-        </div>
-
-
     </div>
 </template>
 
@@ -67,7 +56,6 @@ declare var YT: any
 
 import { ref, onMounted, onUnmounted, computed, defineExpose, watch, nextTick } from 'vue'
 import type { SubtitleItem } from '~/types/subtitle'
-
 
 const props = defineProps<{
     videoId: string
@@ -87,10 +75,15 @@ const playerReady = ref(false)
 let playInterval: ReturnType<typeof setInterval> | null = null
 
 // 字幕拖拽相關
-const position = ref({ x: 100, y: 400 })
+const position = ref({ x: 20, y: 20 }) // 調整初始位置
 const subtitleBox = ref<HTMLElement>()
 let dragging = false
 let offset = { x: 0, y: 0 }
+
+// 檢測是否為觸控設備
+const isTouchDevice = () => {
+    return 'ontouchstart' in window || navigator.maxTouchPoints > 0
+}
 
 // 時間格式轉換函數：將 "00:00:14,080" 轉換為秒數
 const timeStringToSeconds = (timeString: string): number => {
@@ -144,6 +137,8 @@ onUnmounted(() => {
     if (dragging) {
         document.removeEventListener('mousemove', onDrag)
         document.removeEventListener('mouseup', stopDrag)
+        document.removeEventListener('touchmove', onTouch)
+        document.removeEventListener('touchend', stopTouch)
         document.body.style.userSelect = ''
     }
     // 清理播放時間追蹤
@@ -169,17 +164,23 @@ const initPlayer = () => {
 
         console.log('Creating YouTube player with videoId:', props.videoId)
         player.value = new window.YT.Player('youtube-player', {
-            height: '480',
-            width: '800',
+            height: '100%',
+            width: '100%',
             videoId: props.videoId,
             playerVars: {
                 // 關閉 YouTube 內建字幕避免衝突
                 cc_load_policy: 0,
                 // 自動播放設為 0，需要用戶互動
                 autoplay: 0,
+                // 優化 mobile 播放
+                playsinline: 1,
                 // 其他參數
                 modestbranding: 1,
-                rel: 0
+                rel: 0,
+                // 移除相關影片建議
+                iv_load_policy: 3,
+                // 隱藏 YouTube logo
+                showinfo: 0
             },
             events: {
                 onReady: (event: any) => {
@@ -233,7 +234,8 @@ const handleStateChange = (event: any) => {
         if (state === window.YT.PlayerState.PAUSED) {
             stopTrackingTime()
         } else if (state === window.YT.PlayerState.ENDED) {
-            alert("Player End")
+            //alert("Player End")
+            window.location.href = '/'
         }
     }
 }
@@ -330,29 +332,71 @@ const getPlayerBounds = () => {
 // 限制字幕在播放器範圍內
 const constrainPosition = (x: number, y: number) => {
     const playerBounds = getPlayerBounds()
+    const playerContainer = document.getElementById('youtube-player')?.parentElement
+    const containerRect = playerContainer?.getBoundingClientRect()
+
+    if (!containerRect) return { x, y }
+
     const subtitleWidth = subtitleBox.value?.offsetWidth || 200
     const subtitleHeight = subtitleBox.value?.offsetHeight || 60
 
     return {
-        x: Math.min(Math.max(x, 0), playerBounds.width - subtitleWidth),
-        y: Math.min(Math.max(y, 0), playerBounds.height - subtitleHeight)
+        x: Math.min(Math.max(x, 10), containerRect.width - subtitleWidth - 10),
+        y: Math.min(Math.max(y, 10), containerRect.height - subtitleHeight - 10)
     }
+}
+
+// 觸控開始
+const startTouch = (e: TouchEvent) => {
+    if (!isTouchDevice()) return
+
+    e.preventDefault()
+    const touch = e.touches[0]
+    startDragCommon(touch.clientX, touch.clientY)
+
+    document.addEventListener('touchmove', onTouch, { passive: false })
+    document.addEventListener('touchend', stopTouch)
+}
+
+// 觸控移動
+const onTouch = (e: TouchEvent) => {
+    if (!dragging) return
+    e.preventDefault()
+
+    const touch = e.touches[0]
+    onDragCommon(touch.clientX, touch.clientY)
+}
+
+// 觸控結束
+const stopTouch = () => {
+    if (!dragging) return
+
+    dragging = false
+    document.removeEventListener('touchmove', onTouch)
+    document.removeEventListener('touchend', stopTouch)
+    document.body.style.userSelect = ''
 }
 
 // 開始拖拽
 const startDrag = (e: MouseEvent) => {
-    e.preventDefault() // 防止默認行為
-    dragging = true
+    if (isTouchDevice()) return // 觸控設備使用 touch 事件
 
-    // 計算滑鼠相對於字幕框的偏移
-    offset = {
-        x: e.clientX - position.value.x,
-        y: e.clientY - position.value.y,
-    }
+    e.preventDefault()
+    startDragCommon(e.clientX, e.clientY)
 
-    // 添加全局事件監聽器
     document.addEventListener('mousemove', onDrag)
     document.addEventListener('mouseup', stopDrag)
+}
+
+// 拖拽通用邏輯
+const startDragCommon = (clientX: number, clientY: number) => {
+    dragging = true
+
+    // 計算指針相對於字幕框的偏移
+    offset = {
+        x: clientX - position.value.x,
+        y: clientY - position.value.y,
+    }
 
     // 防止文字選擇
     document.body.style.userSelect = 'none'
@@ -363,10 +407,14 @@ const startDrag = (e: MouseEvent) => {
 // 拖拽中
 const onDrag = (e: MouseEvent) => {
     if (!dragging) return
+    onDragCommon(e.clientX, e.clientY)
+}
 
+// 拖拽通用邏輯
+const onDragCommon = (clientX: number, clientY: number) => {
     // 計算新位置
-    const newX = e.clientX - offset.x
-    const newY = e.clientY - offset.y
+    const newX = clientX - offset.x
+    const newY = clientY - offset.y
 
     // 應用邊界限制
     const constrainedPosition = constrainPosition(newX, newY)
@@ -388,7 +436,6 @@ const stopDrag = () => {
 
     console.log('停止拖拽字幕，最終位置:', position.value)
 }
-
 
 // 顯示當前字幕 - 適配新的JSON格式
 const activeSubtitle = computed(() => {
@@ -440,5 +487,16 @@ defineExpose({
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
+}
+
+/* Mobile 優化樣式 */
+@media (max-width: 768px) {
+
+    /* 觸控設備上的拖拽反饋 */
+    .cursor-move:active {
+        cursor: grabbing;
+        transform: scale(1.02);
+        transition: transform 0.1s ease;
+    }
 }
 </style>

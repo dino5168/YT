@@ -1,92 +1,97 @@
 <template>
-    <div class="flex flex-col md:flex-row h-[600px] bg-gray-950">
+    <div class="flex flex-col md:flex-row min-h-[600px] bg-gray-200">
         <!-- 左側播放器 -->
-        <!--螢幕上的字幕-->
         <div :class="[
-            'p-4 flex flex-col h-[100px] md:h-full',
-            showSubtitles ? 'w-full md:w-2/3' : 'w-full md:w-full'
+            'p-2 md:p-4 flex flex-col transition-all duration-500 ease-in-out',
+            // 修復 mobile 高度問題 - 使用 aspect-ratio 確保正確比例
+            showSubtitles ?
+                'w-full md:w-2/3' :
+                'w-full md:w-full'
         ]">
-
-            <div class="bg-white shadow-lg overflow-hidden flex-1">
+            <!-- 使用 aspect-ratio 容器確保 16:9 比例 -->
+            <div class="bg-white shadow-lg overflow-hidden w-full aspect-video">
                 <YouTubePlayer ref="playerRef" :video-id="videoId" :subtitles="subtitles"
                     @time-update="handleTimeUpdate" @duration-update="handleDurationUpdate" class="w-full h-full" />
             </div>
         </div>
 
-        <!-- 右側字幕 -->
-        <div v-if="showSubtitles" class="w-full  md:w-1/3 flex flex-col flex-1 h-[650px] md:py-4">
-            <div
-                class="bg-white shadow-lg rounded-sm border border-blue-900 flex flex-col  md:ml-0 mb-6 md:mx-0 md:mr-6 overflow-hidden">
+        <!-- 右側字幕 - 添加 transition 包裹 -->
+        <transition name="slide-fade" enter-active-class="transition-all duration-500 ease-out"
+            leave-active-class="transition-all duration-300 ease-in"
+            enter-from-class="transform translate-x-full opacity-0" enter-to-class="transform translate-x-0 opacity-100"
+            leave-from-class="transform translate-x-0 opacity-100"
+            leave-to-class="transform translate-x-full opacity-0">
+            <div v-if="showSubtitles" class="w-full md:w-1/3 flex flex-col h-140 mt-4 md:mt-0 md:py-4">
+                <div
+                    class="bg-white shadow-lg rounded-sm border border-blue-900 flex flex-col md:ml-0 md:mx-0 md:mr-6 overflow-hidden transform transition-all duration-300 h-[300px] md:h-full">
 
-                <div class="flex items-center justify-between rounded-sm">
-                    <!-- 標題 -->
-                    <h3 class="font-bold text-lg flex items-center px-4 gap-2">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path>
-                        </svg>
-                        字幕列表
-                    </h3>
-                    <div class="pr-6">
-                        <!-- 工具按鈕 -->
-                        <div class="flex items-center">
-                            <IconButton tooltip="列印字幕">
-                                <template #icon>
-                                    <svg class="h-6 w-6 text-yellow-400" fill="none" stroke="currentColor"
-                                        stroke-width="2" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M11 5h4l6 6v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6z" />
-                                    </svg>
-                                </template>
-                            </IconButton>
+                    <div class="flex items-center justify-between rounded-sm flex-shrink-0">
+                        <!-- 標題 -->
+                        <h3 class="font-bold text-lg flex items-center px-4 py-2 gap-2">
+                            <svg class="w-5 h-5 transition-transform duration-200 hover:scale-110" fill="currentColor"
+                                viewBox="0 0 20 20">
+                                <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path>
+                            </svg>
+                            字幕列表
+                        </h3>
+                        <div class="pr-4">
+                            <!-- 工具按鈕 -->
+                            <div class="flex items-center gap-1">
+                                <IconButton tooltip="列印字幕">
+                                    <template #icon>
+                                        <svg class="h-5 w-5 md:h-6 md:w-6 text-yellow-400 transition-all duration-200 hover:scale-110 hover:text-yellow-300"
+                                            fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M11 5h4l6 6v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6z" />
+                                        </svg>
+                                    </template>
+                                </IconButton>
 
-                            <IconButton tooltip="關閉字幕" @click="hideSubtitles">
-                                <template #icon>
-                                    <svg class="h-6 w-6 text-red-500" fill="none" stroke="currentColor" stroke-width="2"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </template>
-                            </IconButton>
+                                <IconButton tooltip="關閉字幕" @click="hideSubtitles">
+                                    <template #icon>
+                                        <svg class="h-5 w-5 md:h-6 md:w-6 text-red-500 transition-all duration-200 hover:scale-110 hover:text-red-400 hover:rotate-90"
+                                            fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </template>
+                                </IconButton>
+                            </div>
                         </div>
-
                     </div>
 
-                </div>
-
-
-                <div class="flex-1  bg-blue-900 min-h-0">
-                    <div class="h-full">
-                        <SubTitleListHref :current-time="currentTime" :video-id="videoId" @seek-to="handleSeekTo"
-                            class="h-full" />
+                    <div class="flex-1 bg-blue-900 min-h-0 overflow-hidden">
+                        <div class="h-full">
+                            <SubTitleListHref :current-time="currentTime" :video-id="videoId" @seek-to="handleSeekTo"
+                                class="h-full" />
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </transition>
 
-        <!-- 顯示字幕按鈕 -->
+        <!-- 顯示字幕按鈕 - 添加動畫效果 -->
         <!-- 顯示字幕側邊按鈕，只在字幕關閉時出現 -->
-        <div v-if="!showSubtitles" class="fixed top-1/2 right-0 transform -translate-y-1/2 z-50">
-            <button @click="showSubtitles = true"
-                class="group flex items-center justify-center bg-blue-900 text-white px-3 py-4 rounded-l-lg shadow-lg hover:cursor-pointer hover:bg-blue-600 transition-all">
-                <!-- 直排文字 -->
-                <span class="text-sm" style="writing-mode: vertical-rl; text-orientation: upright;">展開字幕</span>
-            </button>
-        </div>
-        <!-- 調試信息 
-        <div class="fixed bottom-4 right-4 bg-black/80 text-white p-3 rounded text-xs max-w-xs">
-            <p><strong>調試信息:</strong></p>
-            <p>字幕數量: {{ subtitles.length }}</p>
-            <p>當前時間: {{ currentTime.toFixed(2) }}s</p>
-            <p>載入狀態: {{ loadStatus }}</p>
-            <div v-if="subtitles.length > 0" class="mt-2 text-green-300">
-                <p>第一個字幕: {{ timeToSeconds(subtitles[0].start_time) }}s - {{ timeToSeconds(subtitles[0].end_time)
-                    }}s
-                </p>
-                <p>EN: {{ subtitles[0].en_text.substring(0, 30) }}...</p>
-                <p>ZH: {{ subtitles[0].zh_text.substring(0, 30) }}...</p>
+        <transition name="slide-in" enter-active-class="transition-all duration-400 ease-out delay-300"
+            leave-active-class="transition-all duration-200 ease-in"
+            enter-from-class="transform translate-x-full opacity-0" enter-to-class="transform translate-x-0 opacity-100"
+            leave-from-class="transform translate-x-0 opacity-100"
+            leave-to-class="transform translate-x-full opacity-0">
+            <div v-if="!showSubtitles" class="fixed top-1/2 right-0 transform -translate-y-1/2 z-50">
+                <button @click="showSubtitlesWithAnimation"
+                    class="group flex items-center justify-center bg-blue-900 text-white px-3 py-4 rounded-l-lg shadow-lg hover:cursor-pointer hover:bg-blue-600 transition-all duration-300 hover:px-4 hover:shadow-xl transform hover:scale-105">
+                    <!-- 直排文字 -->
+                    <span class="text-sm transition-all duration-200 group-hover:text-blue-100"
+                        style="writing-mode: vertical-rl; text-orientation: upright;">展開字幕</span>
+
+                    <!-- 添加動畫指示箭頭 -->
+                    <div
+                        class="absolute -left-1 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                        <div class="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+                    </div>
+                </button>
             </div>
-        </div>
-        -->
+        </transition>
     </div>
 </template>
 
@@ -108,9 +113,17 @@ const subtitles = ref<SubtitleItem[]>([])
 const loadStatus = ref('未開始')
 
 const showSubtitles = ref(true)
+
+// 隱藏字幕 - 添加動畫效果
 const hideSubtitles = () => {
-    console.log('隱藏字幕功能尚未實作')
+    console.log('隱藏字幕')
     showSubtitles.value = false
+}
+
+// 顯示字幕 - 添加動畫效果
+const showSubtitlesWithAnimation = () => {
+    console.log('顯示字幕')
+    showSubtitles.value = true
 }
 
 // 時間字串轉秒數 - 適配新格式
@@ -141,6 +154,29 @@ function timeToSeconds(timeStr: string): number {
         return 0
     }
 }
+const normalizeSubtitles = (data: any[]): SubtitleItem[] =>
+    data
+        .map((item, index) => {
+            return {
+                ...item,
+                en_text: typeof item.en_text === 'string' ? item.en_text : '',
+                zh_text: typeof item.zh_text === 'string' ? item.zh_text : '',
+            }
+        })
+        .filter((item, index) => {
+            const isValid =
+                typeof item.seq === 'number' &&
+                typeof item.start_time === 'string' &&
+                typeof item.end_time === 'string' &&
+                typeof item.en_text === 'string' &&
+                typeof item.zh_text === 'string'
+
+            if (!isValid) {
+                console.warn(`----字幕項目 ${index} 格式錯誤:`, item)
+            }
+
+            return isValid
+        })
 
 // 載入字幕檔 - 改為載入JSON格式
 onMounted(async () => {
@@ -152,41 +188,20 @@ onMounted(async () => {
         // API端點 - 假設您的API返回JSON格式
         const apiUrl = `${srtBaseUrl}/${props.videoId}`
 
-        //console.log('嘗試載入字幕API:', apiUrl)
-        //console.log('當前 videoId:', props.videoId)
-
         const res = await fetch(apiUrl)
-        //console.log('Fetch 響應狀態:', res.status, res.statusText)
 
         if (!res.ok) {
             throw new Error(`找不到字幕資料: ${apiUrl} (HTTP ${res.status})`)
         }
 
         const jsonData = await res.json()
-        //console.log('字幕JSON載入成功，數量:', jsonData.length)
-        //console.log('字幕JSON內容:', jsonData)
 
         // 驗證JSON格式
         if (!Array.isArray(jsonData)) {
             throw new Error('字幕資料格式錯誤：不是陣列格式')
         }
+        const validSubtitles = normalizeSubtitles(jsonData)  // ✅ 直接使用 normalizeSubtitles
 
-        // 驗證每個字幕項目的格式
-        const validSubtitles = jsonData.filter((item, index) => {
-            const isValid = (
-                typeof item.seq === 'number' &&
-                typeof item.start_time === 'string' &&
-                typeof item.end_time === 'string' &&
-                typeof item.en_text === 'string' &&
-                typeof item.zh_text === 'string'
-            )
-
-            if (!isValid) {
-                console.warn(`字幕項目 ${index} 格式錯誤:`, item)
-            }
-
-            return isValid
-        })
 
         subtitles.value = validSubtitles
         loadStatus.value = `成功載入 ${validSubtitles.length} 個字幕`
@@ -261,3 +276,61 @@ function handleSeekTo(time: number) {
     }
 }
 </script>
+
+<style scoped>
+/* 額外的自定義動畫樣式 */
+@keyframes slideInFromRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutToRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* 響應式動畫調整 */
+@media (max-width: 768px) {
+
+    .slide-fade-enter-from,
+    .slide-fade-leave-to {
+        transform: translateY(100%) !important;
+    }
+
+    .slide-in-enter-from,
+    .slide-in-leave-to {
+        transform: translateY(100%) !important;
+    }
+}
+
+/* 按鈕脈衝動畫 */
+@keyframes pulse-subtle {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.animate-pulse-subtle {
+    animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+</style>

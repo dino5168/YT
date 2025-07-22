@@ -14,36 +14,37 @@
       </div>
 
       <!-- YouTube 播放器容器 -->
-      <div class="w-full h-full bg-black rounded-lg overflow-hidden relative">
+      <div class="w-full h-full bg-black rounded-lg overflow-hidden">
         <div id="youtube-player" class="w-full h-full"></div>
-
-        <!-- 字幕顯示 - 固定在播放器容器內部下方 -->
-        <div
-          class="absolute bottom-0 left-0 right-0 bg-black/80 backdrop-blur-sm">
-          <transition name="fade">
-            <div
-              v-if="activeSubtitle"
-              class="text-center px-4 py-3 space-y-2 select-none">
-              <!-- 英文字幕 -->
-              <p
-                v-if="activeSubtitle.en_text"
-                class="text-yellow-300 text-base sm:text-sm md:text-base lg:text-lg font-bold leading-tight drop-shadow-lg">
-                {{ activeSubtitle.en_text }}
-              </p>
-
-              <!-- 中文字幕 -->
-              <p
-                v-if="activeSubtitle.zh_text"
-                class="text-white text-xs sm:text-sm md:text-base lg:text-lg font-medium leading-tight drop-shadow-lg">
-                {{ activeSubtitle.zh_text }}
-              </p>
-            </div>
-            <div v-else class="h-0">
-              <!-- 無字幕時不佔用空間 -->
-            </div>
-          </transition>
-        </div>
       </div>
+    </div>
+
+    <!-- 字幕顯示 - 固定在播放器下方 -->
+    <div
+      class="w-full bg-black/90 rounded-b-lg min-h-[60px] flex items-center justify-center px-4 py-2">
+      <transition name="fade">
+        <div
+          v-if="activeSubtitle"
+          class="text-center max-w-full space-y-1 select-none">
+          <!-- 英文字幕 -->
+          <p
+            v-if="activeSubtitle.en_text"
+            class="text-blue-300 text-xs sm:text-sm md:text-base lg:text-lg font-medium leading-tight">
+            {{ activeSubtitle.en_text }}
+          </p>
+
+          <!-- 中文字幕 -->
+          <p
+            v-if="activeSubtitle.zh_text"
+            class="text-white text-xs sm:text-sm md:text-base lg:text-lg font-medium leading-tight">
+            {{ activeSubtitle.zh_text }}
+          </p>
+        </div>
+        <div v-else class="text-gray-500 text-sm">
+          <!-- 無字幕時的佔位符，保持高度 -->
+          &nbsp;
+        </div>
+      </transition>
     </div>
   </div>
 </template>
@@ -376,10 +377,9 @@ defineExpose({
 
 /* Mobile 優化樣式 */
 @media (max-width: 768px) {
-  /* 手機版字幕調整 */
-  .absolute.bottom-0 p {
-    font-size: 0.75rem;
-    line-height: 1.2;
+  /* 手機版字幕區域調整 */
+  .mobile-subtitle-area {
+    min-height: 50px;
   }
 }
 </style>
