@@ -19,6 +19,7 @@
         <button
           class="hover:text-blue-600 font-bold transition-colors px-2 py-1 rounded flex items-center"
           @click="toggleDropdown(index)"
+          @mouseenter="openDropdown(index)"
           :class="{'text-blue-600': openIndex === index}">
           {{ link.label }}
           <svg
@@ -38,7 +39,9 @@
         <transition name="dropdown">
           <div
             v-if="openIndex === index"
-            class="absolute bg-white shadow-lg font-bold rounded-md mt-1 py-2 w-40 z-50 border border-gray-200 left-0">
+            class="absolute bg-white shadow-lg font-bold rounded-md mt-1 py-2 w-40 z-50 border border-gray-200 left-0"
+            @mouseenter="openDropdown(index)"
+            @mouseleave="closeDropdown">
             <a
               v-for="(item, subIndex) in link.dropdown"
               :key="subIndex"
@@ -84,6 +87,10 @@ const toggleDropdown = (index: number) => {
   openIndex.value = openIndex.value === index ? null : index;
 };
 
+const openDropdown = (index: number) => {
+  openIndex.value = index;
+};
+
 const closeDropdown = () => {
   openIndex.value = null;
 };
@@ -92,34 +99,23 @@ const closeDropdown = () => {
 const handleClickOutside = (event: Event) => {
   const target = event.target as Node;
 
-  // 如果點擊在導航區域外，直接關閉下拉選單
+  // 檢查點擊是否在導航區域內
   if (navRef.value && !navRef.value.contains(target)) {
     closeDropdown();
     return;
   }
 
-  // 檢查點擊是否在當前打開的下拉選單按鈕上
-  if (openIndex.value !== null) {
-    const currentDropdownEl = dropdownRefs.value.get(openIndex.value);
-    if (currentDropdownEl) {
-      const button = currentDropdownEl.querySelector("button");
-      const dropdown = currentDropdownEl.querySelector(
-        'div[class*="absolute"]'
-      );
-
-      // 如果點擊在按鈕上，讓 toggleDropdown 處理（不在這裡關閉）
-      if (button && button.contains(target)) {
-        return;
-      }
-
-      // 如果點擊在下拉選單內容上，不關閉
-      if (dropdown && dropdown.contains(target)) {
-        return;
-      }
-
-      // 其他情況都關閉下拉選單
-      closeDropdown();
+  // 檢查點擊是否在任何下拉選單內
+  let isInsideDropdown = false;
+  dropdownRefs.value.forEach((dropdownEl) => {
+    if (dropdownEl && dropdownEl.contains(target)) {
+      isInsideDropdown = true;
     }
+  });
+
+  // 如果不在下拉選單內，關閉選單
+  if (!isInsideDropdown) {
+    closeDropdown();
   }
 };
 

@@ -99,8 +99,9 @@ if (error.value) {
 const isLogin = computed(() => !!authToken.value && !!user.value);
 // 創建一個 computed 來正確解析用戶數據
 const userData = computed(() => {
-  if (!user.value) return null;
-
+  if (!user.value) {
+    return null;
+  }
   let parsedUser;
   try {
     parsedUser =

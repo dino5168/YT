@@ -7,6 +7,8 @@ export const useNavLinks = async () => {
     secure: true,
     sameSite: "lax",
   });
+  console.log("navLinks==================================== 0 ");
+  console.log(authToken);
 
   const headers: HeadersInit = {};
   if (authToken.value) {
@@ -14,10 +16,13 @@ export const useNavLinks = async () => {
   } else {
     headers.Authorization = `Bearer`;
   }
-
-  return useFetch(`${baseUrl}/nav/links`, {
+  const navLinks = useFetch(`${baseUrl}/nav/links`, {
     headers,
   });
+  console.log("navLinks====================================");
+  console.log(navLinks);
+
+  return navLinks;
 };
 
 export const useNavLinks_simple = async () => {

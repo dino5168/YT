@@ -266,7 +266,9 @@ function jumpToTime(caption: Caption) {
 // 手動滾動處理
 function onManualScroll() {
   isScrolling.value = true;
-  clearTimeout(scrollTimeout.value);
+  if (scrollTimeout.value !== null) {
+    clearTimeout(scrollTimeout.value);
+  }
   scrollTimeout.value = setTimeout(() => {
     isScrolling.value = false;
   }, 100);

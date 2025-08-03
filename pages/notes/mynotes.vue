@@ -6,6 +6,7 @@
       :rows="filteredTableData"
       :columns="columns"
       :column-descriptions="columnDescriptions"
+      :page-size="15"
       @row-click="onRowClick">
       <!-- 自訂欄位顯示 -->
 
@@ -118,8 +119,6 @@ const onRowClick = (row: any) => {
 };
 const onQueryNote = (row: any) => {
   const paddedId = String(row.user_id).padStart(10, "0");
-  alert(paddedId);
-  alert(row.voice_id);
 
   // /student/story
   router.push({

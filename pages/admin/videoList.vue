@@ -67,7 +67,8 @@ interface Video {
   thumbnail_url?: string;
 }
 const baseUrl = useBaseUrl();
-const urlFetch = `${baseUrl}/videos/list`;
+//const urlFetch = `${baseUrl}/videos/listall`;
+const urlFetch = `${baseUrl}/query/all/SELECT_VIDEOS_ALL`;
 
 const {data: videos, pending} = await useFetch<Video[]>(urlFetch);
 
